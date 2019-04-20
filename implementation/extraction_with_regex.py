@@ -1,4 +1,5 @@
 import re
+import json
 
 base_content_path = "../input/"
 
@@ -15,16 +16,17 @@ def extract_from_overstock(file_name: str):
             "Title": "<a\s+href=\"\S*\"><b>(.*)</b>",
             "ListPrice": "nowrap=\"nowrap\">\s*<s>(.*)</s>",
             "Price": "<span class=\"bigred\">\s*<b>(.*)</b>",
-            "Saving": "<span class=\"littleorange\">(\$[0-9\.]*).*</span>",
+            "Saving": "<span class=\"littleorange\">(\$[0-9\.,]*).*</span>",
             "SavingPercent": "<span class=\"littleorange\">.*?\((.*)\)</span>",
             "Content": "<span class=\"normal\">([\s\S]*)<br>"
         }
         for key, regex in regex_dict.items():
             item[key] = re.search(regex, item_html).group(1)
         data_records.append(item)
-    print(data_records)
-    return data_records
+    output = json.dumps(data_records, indent=2)
+    print(output)
+    return output
 
 
 if __name__ == "__main__":
-    extract_from_overstock("overstock.com/jewelry02.html")
+    extract_from_overstock("overstock.com/jewelry01.html")
