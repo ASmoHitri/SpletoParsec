@@ -1,6 +1,7 @@
 import re
 import json
 from lxml import html
+import logging
 
 base_content_path = "../input/"
 
@@ -9,21 +10,28 @@ def extract_from_overstock(file_name: str):
     data_records = []
     html_content = open(base_content_path + file_name, 'r').read()
     html_tree = html.fromstring(html_content)
-    items = html_tree.xpath('//td[@valign="top"][a]')
-    for item in items:
-        data_record = {}
-        data_record["Title"] = str(item.xpath('./a/b/text()')[0])
-        data_record["ListPrice"] = str(item.xpath('.//tbody/tr/td[2]/s/text()')[0])
-        data_record["Price"] = str(item.xpath('.//tbody/tr/td/span[@class="bigred"]/b/text()')[0])
 
-        saving_all = str(item.xpath('.//tbody/tr/td[2]/span/text()')[0])
-        data_record['Saving'] = re.search("\$[0-9.,]*", saving_all).group(0)
-        data_record['SavingPercent'] = re.search("\((.*)\)", saving_all).group(1)
+    titles = html_tree.xpath('//td[@valign="top"]/a/b/text()')
+    list_prices = html_tree.xpath('.//tbody/tr/td[2]/s/text()')
+    prices = html_tree.xpath('//tbody/tr/td/span[@class="bigred"]/b/text()')
+    savings_all = html_tree.xpath('//tbody/tr/td[2]/span[@class="littleorange"]/text()')
+    contents = html_tree.xpath('.//span[@class="normal"]/text()')
+    length = len(titles)
 
-        content_string = str(item.xpath('.//span[@class="normal"]/text()')[0])
-        data_record["Content"] = re.sub("\.\s*$", ".", content_string)      # remove trailing whitespace
+    if all(len(lst) == length for lst in [list_prices, prices, savings_all, contents]):
+        for i in range(length):
+            data_records.append({
+                "Title": titles[i],
+                "ListPrice": list_prices[i],
+                "Price": prices[i],
+                "Saving": re.search("\$[0-9.,]*", savings_all[i]).group(0),
+                "SavingPercent": re.search("\((.*)\)", savings_all[i]).group(1),
+                "Content": re.sub("\.\s*$", ".", contents[i])
+            })
+    else:
+        logging.error("Numbers of matches found in HTML content don't match.")
+        exit(1)
 
-        data_records.append(data_record)
     output = json.dumps(data_records, indent=2)
     print(output)
     return output

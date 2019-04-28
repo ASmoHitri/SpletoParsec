@@ -23,7 +23,6 @@ def extract_from_overstock(file_name: str):
     saving_percents_match = list(re.finditer(regex_dict["SavingPercent"], html_content))
     contents_match = list(re.finditer(regex_dict["Content"], html_content))
     length = len(titles_match)
-    print(str(contents_match[0].group(1)))
     if all(len(lst) == length for lst in [list_prices_match, prices_match, savings_match, saving_percents_match, contents_match]):
         for i in range(length):
             data_records.append({
