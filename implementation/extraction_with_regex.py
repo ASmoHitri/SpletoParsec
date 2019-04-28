@@ -28,5 +28,36 @@ def extract_from_overstock(file_name: str):
     return output
 
 
+def extract_from_rtvslo(file_name: str):
+    html_content = open(base_content_path + file_name, 'r').read()
+    regex_dict = {
+        "Author": "<div class=\"author-name\">(.*)</div>",
+        "PublishedTime": "<div class=\"publish-meta\">\s+(.*)<br>",
+        "Title": "<title>(.*) - RTVSLO.si</title>",
+        "Subtitle": "<div class=\"subtitle\">(.*)</div>",
+        "Lead": "<p class=\"lead\">(.*)\s*</p>",
+        "Content": "<p\s*[class=\"Body\"]*>(.+?)</p>"
+    }
+
+    dataItem = {}
+    for key, regex in regex_dict.items():
+        if key == "Content":
+            out = ''
+            for str in re.findall(regex, html_content):
+                str = re.sub("<[^>]*>", " ", str)
+                out += ' '+str
+            dataItem[key] = out
+        else:
+            dataItem[key] = re.search(regex, html_content).group(1)
+    dataItem
+    # print(json.dumps(dataItem, indent=2, ensure_ascii=False))
+    return json.dumps(dataItem, indent=2, ensure_ascii=False)
+
+
 if __name__ == "__main__":
     extract_from_overstock("overstock.com/jewelry01.html")
+
+    extract_from_rtvslo(
+        "rtvslo.si/Audi A6 50 TDI quattro_ nemir v premijskem razredu - RTVSLO.si.html")
+    extract_from_rtvslo(
+        "rtvslo.si/Volvo XC 40 D4 AWD momentum_ suvereno med najboljs╠îe v razredu - RTVSLO.si.html")
