@@ -62,7 +62,7 @@ def extract_from_rtvslo(file_name: str):
                 strng = re.sub("<[^>]*>", " ", strng)
                 if strng != '' and strng:
                     strng = strng.strip()
-                    print(strng)
+                    # print(strng)
                     out += ' '+strng
             dataItem[key] = out[1:]
         else:
