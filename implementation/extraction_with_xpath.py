@@ -8,7 +8,7 @@ base_content_path = "../input/"
 
 def extract_from_overstock(file_name: str):
     data_records = []
-    html_content = open(base_content_path + file_name, 'r').read()
+    html_content = open(base_content_path + file_name, 'r', encoding='Latin_1').read()
     html_tree = html.fromstring(html_content)
 
     titles = html_tree.xpath('//td[@valign="top"]/a/b/text()')
@@ -38,7 +38,7 @@ def extract_from_overstock(file_name: str):
 
 
 def extract_from_rtvslo(file_name: str):
-    html_content = open(base_content_path + file_name, 'r').read()
+    html_content = open(base_content_path + file_name, 'r', encoding="utf-8").read()
     html_tree = html.fromstring(html_content)
     xpath_dict = {
         "Author": '//*[@id="main-container"]/div[3]/div/header/div[3]/div[1]/strong/text()',
@@ -51,8 +51,9 @@ def extract_from_rtvslo(file_name: str):
     dataItem = {}
     for key, xpth in xpath_dict.items():
         if key == "Title":
-            dataItem[key] = re.sub(" - RTVSLO.si", "", html_tree.xpath(xpth)[0].strip())
-        if key == "Content":
+            test = re.sub(" - RTVSLO.si", "", html_tree.xpath(xpth)[0].strip())
+            dataItem[key] = test
+        elif key == "Content":
             out = ''
             for entry in html_tree.xpath(xpth):
                 out += ' '+entry

@@ -7,7 +7,7 @@ base_content_path = "../input/"
 
 def extract_from_overstock(file_name: str):
     data_records = []
-    html_content = open(base_content_path + file_name, 'r').read()
+    html_content = open(base_content_path + file_name, 'r', encoding="Latin_1").read()
     regex_dict = {
         "Title": "<td valign=\"top\">\s+<a\s+href=\"\S*\"><b>(.*)</b>",
         "ListPrice": "List Price:</b>\s*</td>\s*<td align=\"left\" nowrap=\"nowrap\">\s*<s>(.*)</s>",
@@ -43,14 +43,14 @@ def extract_from_overstock(file_name: str):
 
 
 def extract_from_rtvslo(file_name: str):
-    html_content = open(base_content_path + file_name, 'r').read()
+    html_content = open(base_content_path + file_name, 'r', encoding="utf-8").read()
     regex_dict = {
         "Author": "<div class=\"author-name\">(.*)</div>",
         "PublishedTime": "<div class=\"publish-meta\">\s+(.*)<br>",
         "Title": "<title>(.*) - RTVSLO.si</title>",
         "Subtitle": "<div class=\"subtitle\">(.*)</div>",
         "Lead": "<p class=\"lead\">(.*)\s*</p>",
-        "Content": "<article class=\"article\">(\s\S*)</article>"
+        "Content": "<p\s*[(class=\"Body\"]*>(.+?)</p>"  # popravi zadnji del
     }
 
     dataItem = {}
@@ -58,6 +58,7 @@ def extract_from_rtvslo(file_name: str):
         if key == "Content":
             out = ''
             for strng in re.findall(regex, html_content):
+                print(strng)
                 strng = re.sub("<[^>]*>", " ", strng)
                 if strng != '' and strng:
                     strng = strng.strip()
