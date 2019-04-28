@@ -57,10 +57,12 @@ def extract_from_rtvslo(file_name: str):
     for key, regex in regex_dict.items():
         if key == "Content":
             out = ''
-            for str in re.findall(regex, html_content):
-                str = re.sub("<[^>]*>", " ", str)
-                if str != '' and str:
-                    out += ' '+str
+            for strng in re.findall(regex, html_content):
+                strng = re.sub("<[^>]*>", " ", strng)
+                if strng != '' and strng:
+                    strng = strng.strip()
+                    # print(strng)
+                    out += ' '+strng
             dataItem[key] = out[1:]
         else:
             dataItem[key] = re.search(regex, html_content).group(1)
@@ -72,7 +74,7 @@ def extract_from_rtvslo(file_name: str):
 if __name__ == "__main__":
     extract_from_overstock("overstock.com/jewelry01.html")
 
-    print(extract_from_rtvslo(
-        "rtvslo.si/Audi A6 50 TDI quattro_ nemir v premijskem razredu - RTVSLO.si.html"))
-    print(extract_from_rtvslo(
-        "rtvslo.si/Volvo XC 40 D4 AWD momentum_ suvereno med najboljs╠îe v razredu - RTVSLO.si.html"))
+    extract_from_rtvslo(
+        "rtvslo.si/Audi A6 50 TDI quattro_ nemir v premijskem razredu - RTVSLO.si.html")
+    extract_from_rtvslo(
+        "rtvslo.si/Volvo XC 40 D4 AWD momentum_ suvereno med najboljs╠îe v razredu - RTVSLO.si.html")
