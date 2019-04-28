@@ -1,5 +1,6 @@
 import re
 import json
+import logging
 
 base_content_path = "../input/"
 
@@ -7,23 +8,37 @@ base_content_path = "../input/"
 def extract_from_overstock(file_name: str):
     data_records = []
     html_content = open(base_content_path + file_name, 'r').read()
-    item_regex = "<td valign=\"top\">\s+<a.*</a>[\s\S]*?<a"
-    item_matches = re.finditer(item_regex, html_content)
-    for match in item_matches:
-        item_html = match.group(0)
-        item = {}
-        regex_dict = {
-            "Title": "<a\s+href=\"\S*\"><b>(.*)</b>",
-            "ListPrice": "nowrap=\"nowrap\">\s*<s>(.*)</s>",
-            "Price": "<span class=\"bigred\">\s*<b>(.*)</b>",
-            "Saving": "<span class=\"littleorange\">(\$[0-9\.,]*).*</span>",
-            "SavingPercent": "<span class=\"littleorange\">.*?\((.*)\)</span>",
-            "Content": "<span class=\"normal\">([\s\S]*)<br>"
-        }
-        for key, regex in regex_dict.items():
-            item[key] = re.search(regex, item_html).group(1)
-        data_records.append(item)
-    output = json.dumps(data_records, indent=2)
+    regex_dict = {
+        "Title": "<td valign=\"top\">\s+<a\s+href=\"\S*\"><b>(.*)</b>",
+        "ListPrice": "List Price:</b>\s*</td>\s*<td align=\"left\" nowrap=\"nowrap\">\s*<s>(.*)</s>",
+        "Price": "<span class=\"bigred\">\s*<b>(.*)</b>",
+        "Saving": "<span class=\"littleorange\">(\$[0-9\.,]*).*</span>",
+        "SavingPercent": "<span class=\"littleorange\">.*?\((.*)\)</span>",
+        "Content": "<span class=\"normal\">([\s\S]*?)<br>"
+    }
+    titles_match = list(re.finditer(regex_dict["Title"], html_content))
+    list_prices_match = list(re.finditer(regex_dict["ListPrice"], html_content))
+    prices_match = list(re.finditer(regex_dict["Price"], html_content))
+    savings_match = list(re.finditer(regex_dict["Saving"], html_content))
+    saving_percents_match = list(re.finditer(regex_dict["SavingPercent"], html_content))
+    contents_match = list(re.finditer(regex_dict["Content"], html_content))
+    length = len(titles_match)
+    print(str(contents_match[0].group(1)))
+    if all(len(lst) == length for lst in [list_prices_match, prices_match, savings_match, saving_percents_match, contents_match]):
+        for i in range(length):
+            data_records.append({
+                "Title": titles_match[i].group(1),
+                "ListPrice": list_prices_match[i].group(1),
+                "Price": prices_match[i].group(1),
+                "Saving": savings_match[i].group(1),
+                "SavingPercent": saving_percents_match[i].group(1),
+                "Content": contents_match[i].group(1)
+            })
+    else:
+        logging.error("Numbers of matches found in HTML content don't match.")
+        exit(1)
+
+    output = json.dumps(data_records, ensure_ascii=False, indent=2)
     print(output)
     return output
 
