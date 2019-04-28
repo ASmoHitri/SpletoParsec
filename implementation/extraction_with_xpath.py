@@ -39,10 +39,6 @@ def extract_from_overstock(file_name: str):
 
 def extract_from_rtvslo(file_name: str):
     html_content = open(base_content_path + file_name, 'r').read()
-    # html_content = open(
-    #     base_content_path + "rtvslo.si/Audi A6 50 TDI quattro_ nemir v premijskem razredu - RTVSLO.si.html").read()
-    # html_content = open(
-    #     base_content_path + "rtvslo.si/Volvo XC 40 D4 AWD momentum_ suvereno med najboljs╠îe v razredu - RTVSLO.si.html").read()
     html_tree = html.fromstring(html_content)
     xpath_dict = {
         "Author": '//*[@id="main-container"]/div[3]/div/header/div[3]/div[1]/strong/text()',
@@ -52,11 +48,7 @@ def extract_from_rtvslo(file_name: str):
         "Lead": "//*[@id=\"main-container\"]/div[3]/div/header/p/text()",
         "Content": "//*[@id=\"main-container\"]/div[3]/div/div[2]/article/p/text()"
     }
-    # //*[@id = "main-container"]/div[3]/div/div[2]/article/p[3]
     dataItem = {}
-    # test = "Content"
-    # html_tree.xpath(xpath_dict[test])
-    # # dataItem
     for key, xpth in xpath_dict.items():
         if key == "Title":
             dataItem[key] = re.sub(" - RTVSLO.si", "", html_tree.xpath(xpth)[0].strip())
@@ -74,6 +66,6 @@ def extract_from_rtvslo(file_name: str):
 if __name__ == "__main__":
     extract_from_overstock("overstock.com/jewelry01.html")
     extract_from_rtvslo(
-        "rtvslo.si/Audi A6 50 TDI quattro_ nemir v premijskem razredu - RTVSLO.si.html")
+        "rtvslo.si/Audi.html")
     extract_from_rtvslo(
-        "rtvslo.si/Volvo XC 40 D4 AWD momentum_ suvereno med najboljs╠îe v razredu - RTVSLO.si.html")
+        "rtvslo.si/Volvo.html")

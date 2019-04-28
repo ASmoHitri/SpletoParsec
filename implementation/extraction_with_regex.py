@@ -50,7 +50,7 @@ def extract_from_rtvslo(file_name: str):
         "Title": "<title>(.*) - RTVSLO.si</title>",
         "Subtitle": "<div class=\"subtitle\">(.*)</div>",
         "Lead": "<p class=\"lead\">(.*)\s*</p>",
-        "Content": "<p\s*[class=\"Body\"]*>(.+?)</p>"
+        "Content": "<article class=\"article\">(\s\S*)</article>"
     }
 
     dataItem = {}
@@ -66,8 +66,7 @@ def extract_from_rtvslo(file_name: str):
             dataItem[key] = out[1:]
         else:
             dataItem[key] = re.search(regex, html_content).group(1)
-    # dataItem
-    # print(json.dumps(dataItem, indent=2, ensure_ascii=False))
+    print(json.dumps(dataItem, indent=2, ensure_ascii=False))
     return json.dumps(dataItem, indent=2, ensure_ascii=False)
 
 
@@ -75,6 +74,6 @@ if __name__ == "__main__":
     extract_from_overstock("overstock.com/jewelry01.html")
 
     extract_from_rtvslo(
-        "rtvslo.si/Audi A6 50 TDI quattro_ nemir v premijskem razredu - RTVSLO.si.html")
+        "rtvslo.si/Audi.html")
     extract_from_rtvslo(
-        "rtvslo.si/Volvo XC 40 D4 AWD momentum_ suvereno med najboljs╠îe v razredu - RTVSLO.si.html")
+        "rtvslo.si/Volvo.html")
