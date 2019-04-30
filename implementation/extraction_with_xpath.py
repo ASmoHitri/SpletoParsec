@@ -46,13 +46,12 @@ def extract_from_rtvslo(file_name: str):
         "Title": "/html/head/title/text()",
         "Subtitle": "//*[@id=\"main-container\"]/div[3]/div/header/div[2]/text()",
         "Lead": "//*[@id=\"main-container\"]/div[3]/div/header/p/text()",
-        "Content": "//*[@id=\"main-container\"]/div[3]/div/div[2]/article/p/text()"
+        "Content": "//*[@id=\"main-container\"]/div[3]/div/div[2]/article/p/text()|//*[@id=\"main-container\"]/div[3]/div/div[2]/article/p/strong/text()"
     }
     dataItem = {}
     for key, xpth in xpath_dict.items():
         if key == "Title":
-            test = re.sub(" - RTVSLO.si", "", html_tree.xpath(xpth)[0].strip())
-            dataItem[key] = test
+            dataItem[key] = re.sub(" - RTVSLO.si", "", html_tree.xpath(xpth)[0].strip())
         elif key == "Content":
             out = ''
             for entry in html_tree.xpath(xpth):

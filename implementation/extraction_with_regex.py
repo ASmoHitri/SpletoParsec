@@ -50,7 +50,7 @@ def extract_from_rtvslo(file_name: str):
         "Title": "<title>(.*) - RTVSLO.si</title>",
         "Subtitle": "<div class=\"subtitle\">(.*)</div>",
         "Lead": "<p class=\"lead\">(.*)\s*</p>",
-        "Content": "<p\s*[(class=\"Body\"]*>(.+?)</p>"  # popravi zadnji del
+        "Content": "<p\s*[(class=\"Body\"]*>(.+?)</p>(?=[\S\s]*class=\"news-block \w+\")"
     }
 
     dataItem = {}
@@ -58,11 +58,9 @@ def extract_from_rtvslo(file_name: str):
         if key == "Content":
             out = ''
             for strng in re.findall(regex, html_content):
-                print(strng)
                 strng = re.sub("<[^>]*>", " ", strng)
                 if strng != '' and strng:
                     strng = strng.strip()
-                    # print(strng)
                     out += ' '+strng
             dataItem[key] = out[1:]
         else:
@@ -76,5 +74,6 @@ if __name__ == "__main__":
 
     extract_from_rtvslo(
         "rtvslo.si/Audi.html")
+
     extract_from_rtvslo(
         "rtvslo.si/Volvo.html")
