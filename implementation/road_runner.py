@@ -27,10 +27,11 @@ def get_next_item(html):
     if html[idx] == "<":
         while html[idx] != ">":
             idx += 1
+        return html[0:idx + 1].strip(), html[idx + 1:]
     else:
         while html[idx] != "<":
             idx += 1
-    return html[0:idx].strip(), html[idx:]
+        return html[0:idx].strip(), html[idx:]
 
 
 def is_tag(string):
@@ -140,6 +141,23 @@ if __name__ == "__main__":
     html = "<li>		dfjsdf		<i> </i>	</li>	<li>		ldkfpfadgr		</li>	<p>\
      class=\"fgjtr\">		hdhrfrh	</p></div>"
     print(get_next_different_tag("li", html))
+
+def get_tag_name(tag):
+    return re.search("<*(\w*)>", tag).group(1)
+
+#TODO: spremeni ime
+def get_sth(tag_name, html):
+    n_rows = 0 #stevilo vmrensih vrstic
+    while True:
+        next_item, html = get_next_item(html)
+        if is_tag(next_item):
+            if get_tag_name(next_item) == tag_name:
+                n_rows += 1
+            else:
+                return next_item, n_rows
+
+
+
 
 
 
