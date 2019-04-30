@@ -34,7 +34,7 @@ def get_iterator_square_candidate(tag_name, html):
         elif next_item == "<{}>".format(tag_name):
             num_of_opening_tags += 1
         square_list.append(next_item)
-    return square_list
+    return square_list, html
 
 
 def get_next_different_tag(tag_name, html):
@@ -46,7 +46,7 @@ def get_next_different_tag(tag_name, html):
 
 
 def get_previous_tag_name(items_list):
-    idx = len(items_list) - 1
+    idx = len(items_list) - 2
     while not is_tag(items_list[idx]):
         idx -= 1
     tag = items_list[idx]
@@ -54,11 +54,16 @@ def get_previous_tag_name(items_list):
 
 
 def get_upper_square(items_list):
-    idx = len(items_list) - 1
+    num_of_closing_tags = 1
+    idx = len(items_list) - 2
     tag_name = get_tag_name(items_list[-1])
-    while items_list[idx] != "<{}>".format(tag_name):
+    while num_of_closing_tags > 0:
         idx -= 1
-    return items_list[idx:-2]
+        if items_list[idx] == "<{}>".format(tag_name):
+            num_of_closing_tags -= 1
+        elif items_list[idx] == "</{}>".format(tag_name):
+            num_of_closing_tags += 1
+    return items_list[idx:-1]
 
 
 def compare_tree(wrapper_html, sample_html):
