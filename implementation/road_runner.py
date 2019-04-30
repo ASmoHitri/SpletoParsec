@@ -1,23 +1,7 @@
 import re
 from lxml.html.clean import Cleaner
-from lxml import etree
 base_content_path = "../input/"
 
-
-# def get_wrapper(file_name1, file_name2, encoding="utf-8"):
-#     # wrapper_content = open(base_content_path + file_name1, 'r', encoding=encoding).read()
-#     # sample_content = open(base_content_path + file_name2, 'r', encoding=encoding).read()
-#     # wrapper_soup = BeautifulSoup(wrapper_content, 'html.parser')
-#     # sample_soup = BeautifulSoup(sample_content, 'html.parser')
-#     bad_html = "<html><title>Title of the document       <div> Something </div>   neki neki       \n</title><p> Nek text </p></head>"
-#     cleaner = Cleaner(style=True, page_structure=False)
-#     html = cleaner.clean_html(bad_html)
-#     # print(html)
-#
-#     tree = etree.HTML(html)
-#     print(etree.tostring(tree, pretty_print=True))
-#     for child in tree.iter():
-#             print(child.tag)
 
 def get_next_item(html):
     """
@@ -41,12 +25,15 @@ def is_tag(string):
 
 
 def get_iterator_square_candidate(tag_name, html):
+    num_of_opening_tags = 1
     square_list = ["<{}>".format(tag_name)]
-    next_item, html = get_next_item(html)
-    while next_item != "</{}>".format(tag_name):
-        square_list.append(next_item)
+    while num_of_opening_tags > 0:
         next_item, html = get_next_item(html)
-    square_list.append(next_item)
+        if next_item == "</{}>".format(tag_name):
+            num_of_opening_tags -= 1
+        elif next_item == "<{}>".format(tag_name):
+            num_of_opening_tags += 1
+        square_list.append(next_item)
     return square_list
 
 
@@ -64,6 +51,14 @@ def get_previous_tag_name(items_list):
         idx -= 1
     tag = items_list[idx]
     return "".join(filter(str.isalpha, tag))
+
+
+def get_upper_square(items_list):
+    idx = len(items_list) - 1
+    tag_name = get_tag_name(items_list[-1])
+    while items_list[idx] != "<{}>".format(tag_name):
+        idx -= 1
+    return items_list[idx:-2]
 
 
 def compare_tree(wrapper_html, sample_html):
@@ -94,18 +89,26 @@ def compare_tree(wrapper_html, sample_html):
             if is_tag(next_item_s):
                 # tag mismatch
                 prev_tag_name = get_previous_tag_name(wrapper_list)
-                curr_tag_name = "".join(filter(str.isalpha, next_item_s))
-                iterator_candidate_html = wrapper_html
-                if curr_tag_name == prev_tag_name:
+                curr_sample_tag_name = get_tag_name(next_item_s)
+                curr_wrapper_tag_name = get_tag_name(next_item_w)
+
+                iterator_candidate_html = None
+                iterator_candidate_list = None
+                if curr_wrapper_tag_name == prev_tag_name:
+                    iterator_candidate_html = wrapper_html
+                    iterator_candidate_list = wrapper_list
+                elif curr_sample_tag_name == prev_tag_name:
                     iterator_candidate_html = sample_html
-                square_candidate = get_iterator_square_candidate(prev_tag_name, iterator_candidate_html)
-                # check if iterator
+                    iterator_candidate_list = sample_list
+                if iterator_candidate_html:
+                    square_candidate = get_iterator_square_candidate(prev_tag_name, iterator_candidate_html)
+                    upper_square = get_upper_square(iterator_candidate_list)
+                    # check if iterator
 
-                # if not iterator --> optional -- cross matching
+                # not iterator --> optional -- cross matching
                 # TODO ne bo okkk, rabis indexe!!
-                wrapper_next = get_next_different_tag(curr_tag_name, wrapper_html)
-                sample_next = get_next_different_tag(curr_tag_name, sample_html)
-
+                wrapper_next = get_next_different_tag(curr_wrapper_tag_name, wrapper_html)
+                sample_next = get_next_different_tag(curr_sample_tag_name, sample_html)
 
             else:
                 # string-tag mismatch --> sample string
@@ -140,7 +143,10 @@ if __name__ == "__main__":
 
     html = "<li>		dfjsdf		<i> </i>	</li>	<li>		ldkfpfadgr		</li>	<p>\
      class=\"fgjtr\">		hdhrfrh	</p></div>"
-    print(get_next_different_tag("li", html))
+    # print(get_next_different_tag("li", html))
+
+    regex_str = "</?(\w*)[\s\S]*?>"
+    print(re.search(regex_str, "</li class=jfke>").group(1))
 
 def get_tag_name(tag):
     return re.search("<*(\w*)>", tag).group(1)
