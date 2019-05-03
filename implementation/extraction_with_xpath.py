@@ -63,7 +63,7 @@ def extract_from_rtvslo(file_name: str):
     return json.dumps(dataItem, indent=2, ensure_ascii=False)
 
 
-html_content = open("C:\\Users\\Uporabnik\\Documents\\Programiranje\\SpletoParsec\\input\\ideo.si\\stroji za pometanje _ ideo.si.html", 'r').read()
+html_content = open("C:\\Users\\Uporabnik\\Documents\\Programiranje\\SpletoParsec\\input\\ideo.si\\posteljni podi in vzmetnice _ ideo.si.html", 'r').read()
 
 html_tree = html.fromstring(html_content)
 
@@ -80,7 +80,7 @@ def extract_from_ideo(file_name: str):
     html_tree = html.fromstring(html_content)
 
     title = """//*[@id="izdelki_okvir"]/div/div/div/div/a/text()"""
-    lead = "//div[@class=\"opis mobilno-skrij\"]/div/text()"
+    lead = "//div[@class=\"opis mobilno-skrij\"]/div/text()[last()]"
     price = """//*[@id="izdelki_okvir"]/div/div/div/div/div[2]/text()"""
     stock = """//*[@id="izdelki_okvir"]/div/div/div/div/span[2]/a/text()"""
 
