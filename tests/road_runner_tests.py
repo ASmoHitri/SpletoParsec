@@ -23,19 +23,22 @@ class TestRoadRunnerMethods(unittest.TestCase):
 
     def test_get_iterator_square_candidate(self):
         # simple test
-        test_html = "some item <i>test text</i></li></div>"
-        self.assertEqual((["<li>", "some item", "<i>", "test text", '</i>', "</li>"], "</div>"),
-                         road_runner.get_iterator_square_candidate("li", test_html))
+        test_html = ["</div>",
+                     "<li>", "previous item", "</li>",
+                     "<li>", "some item", "<i>", "test text", '</i>', "</li>",
+                     "<div>"]
+        self.assertEqual((["<li>", "some item", "<i>", "test text", '</i>', "</li>"], 9),
+                         road_runner.get_iterator_square_candidate("li", test_html, 4))
 
         # search with nested tag test 1
-        test_html = "some item <p>test text</p></p></div></p>"
-        self.assertEqual((["<p>", "some item", "<p>", "test text", '</p>', "</p>"], "</div></p>"),
-                         road_runner.get_iterator_square_candidate("p", test_html))
+        test_html = ["<p>", "some item", "<p>", "test text", "</p>", "</p>", "</div>", "</p>"]
+        self.assertEqual((["<p>", "some item", "<p>", "test text", '</p>', "</p>"], 5),
+                         road_runner.get_iterator_square_candidate("p", test_html, 0))
 
         # search with nested tag test 2
-        test_html = "some item <p>test text</p></p></p>"
-        self.assertEqual((["<p>", "some item", "<p>", "test text", '</p>', "</p>"], "</p>"),
-                         road_runner.get_iterator_square_candidate("p", test_html))
+        test_html = ["<p>", "some item", "<p>", "test text", "</p>", "</p>", "</p>"]
+        self.assertEqual((["<p>", "some item", "<p>", "test text", '</p>', "</p>"], 5),
+                         road_runner.get_iterator_square_candidate("p", test_html, 0))
 
     def test_get_next_different_tag(self):
         # TODO
@@ -44,17 +47,17 @@ class TestRoadRunnerMethods(unittest.TestCase):
     def test_get_previous_tag_name(self):
         # no string between test
         html_list = ["<li>", "best item", "</li>", "<div>"]
-        self.assertEqual("li", road_runner.get_previous_tag_name(html_list))
+        self.assertEqual("li", road_runner.get_previous_tag_name(html_list, 3))
 
         # string between test
         html_list = ["<li>", "best item", "</li>", "some text", "<div>"]
-        self.assertEqual("li", road_runner.get_previous_tag_name(html_list))
+        self.assertEqual("li", road_runner.get_previous_tag_name(html_list, 4))
 
     def test_get_upper_square(self):
         # simple test
-        html_list = ["</li>", "<li>", "best item", "</li>", "<li>"]
-        self.assertEqual(["<li>", "best item", "</li>"], road_runner.get_upper_square(html_list))
+        html_list = ["</li>", "<li>", "best item", "</li>", "<li>", "more text"]
+        self.assertEqual(["<li>", "best item", "</li>"], road_runner.get_upper_square(html_list, 4))
 
         # test with nested tags
         html_list = ["</p>", "<p>", "best text", "<p>", "inner text", "</p>", "</p>", "<p>"]
-        self.assertEqual(["<p>", "best text", "<p>", "inner text", "</p>", "</p>"], road_runner.get_upper_square(html_list))
+        self.assertEqual(["<p>", "best text", "<p>", "inner text", "</p>", "</p>"], road_runner.get_upper_square(html_list, 7))
