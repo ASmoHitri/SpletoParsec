@@ -100,6 +100,6 @@ if __name__ == "__main__":
 
     extract_from_ideo("ideo.si/stroji za pometanje _ ideo.si.html")
 
-    extract_from_ideo("ideo.si/posteljni podi in vzmetnice _ ideo.si.html")
+    extract_from_ideo("ideo.si/Termostatski podometni kompleti _ ideo.si.html")
 
 
