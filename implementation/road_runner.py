@@ -67,6 +67,37 @@ def get_upper_square(items_list, curr_idx):
     return items_list[idx:curr_idx]
 
 
+def is_iterator(wrapper_list, sample_list):
+    regex_list = []
+    wrapper_idx = 0
+    sample_idx = 0
+
+    while wrapper_idx < len(wrapper_list) and sample_idx < len(sample_list):
+        next_item_w = wrapper_list[wrapper_idx]
+        next_item_s = sample_list[sample_idx]
+        if next_item_w == next_item_s:
+            regex_list.append(next_item_w)
+            wrapper_idx += 1
+            sample_idx += 1
+            continue
+        if is_tag(next_item_w):
+            if is_tag(next_item_s):
+                return False, None
+            # string-tag mismatch --> sample string
+            regex_list.append("(.*?)")
+            sample_idx += 1
+        elif is_tag(next_item_s):
+            # string-tag mismatch --> wrapper string
+            regex_list.append("(.*?)")
+            wrapper_idx += 1
+        else:
+            # string mismatch
+            regex_list.append("(.*?)")
+            wrapper_idx += 1
+            sample_idx += 1
+    return True, regex_list
+
+
 # def compare_tree(wrapper_html, sample_html):
 #     """
 #     :param wrapper_html: Wrapper HTML
@@ -136,6 +167,7 @@ def compare_tree(wrapper_list, sample_list):
     :param wrapper_list: Wrapper HTML list
     :param sample_list: Sample HTML list
     """
+
     regex_list = []
     idxs = [0, 0]   # 0 - wrapper index, 1 - sample index
     wrapper_len = len(wrapper_list)
@@ -154,15 +186,24 @@ def compare_tree(wrapper_list, sample_list):
         if is_tag(next_item_w):
             if is_tag(next_item_s):
                 # tag mismatch
-                prev_tag_name = get_previous_tag_name(wrapper_list, idxs[0])
+                prev_tag_name_wrapper = get_previous_tag_name(wrapper_list, idxs[0])
+                prev_tag_name_sample = get_previous_tag_name(sample_list, idxs[1])
                 curr_sample_tag_name = get_tag_name(next_item_s)
                 curr_wrapper_tag_name = get_tag_name(next_item_w)
 
                 iterator_candidate_list = None
                 iterator_idx = 0
-                if curr_wrapper_tag_name == prev_tag_name:
+                if curr_wrapper_tag_name == prev_tag_name_wrapper:
                     iterator_candidate_list = wrapper_list
-                elif curr_sample_tag_name == prev_tag_name:
+                    square_candidate, new_idx = get_iterator_square_candidate(prev_tag_name_wrapper, iterator_candidate_list,
+                                                                              idxs[iterator_idx])
+                    upper_square = get_upper_square(iterator_candidate_list, idxs[iterator_idx])
+                    iterator, iterator_regex = is_iterator(upper_square, square_candidate)
+                    if iterator:
+
+
+
+                elif curr_sample_tag_name == prev_tag_name_sample:
                     iterator_candidate_list = sample_list
                     iterator_idx = 1
 
