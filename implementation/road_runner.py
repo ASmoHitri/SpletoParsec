@@ -184,11 +184,8 @@ def update_iterator_regex(regex, iterator_regex):
     return before_regex + iterator_regex + after_regex
 
 
-def is_end_tag(tag):
-    return tag[1] == "/"
-
 def get_next_tag(html_list, index, tag_name):
-    is_end = is_end_tag(html_list[index])
+    is_end = is_tag(html_list[index], which_tag='end')
     #is end tag, pogledamo prvega, ki se razlikuje
     if is_end:
         while True:
@@ -205,7 +202,7 @@ def get_next_tag(html_list, index, tag_name):
             if is_tag(html_list[index]):
                 if start_tags == end_tags:
                     return (index, get_tag_name(html_list[index]))
-                elif is_end_tag(html_list[index]):
+                elif is_tag(html_list[index], which_tag='end'):
                     end_tags += 1
                 else:
                     start_tags += 1
