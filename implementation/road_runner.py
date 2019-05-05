@@ -120,8 +120,43 @@ def is_iterator(wrapper_list, sample_list):
 def update_iterator_regex(regex, iterator_regex):
     idx = len(regex) - 1
     iterator_tag_name = get_tag_name(iterator_regex[0])
-    if get_tag_name(regex[-1]) == iterator_tag_name:
-        pass
+    curr_tag_name = get_tag_name(regex[idx])
+    if curr_tag_name != iterator_tag_name:
+        num_of_closing_tags = 1
+        while num_of_closing_tags > 0:
+            idx -= 1
+            if get_tag_name(regex[idx]) == curr_tag_name:
+                tag_state = is_tag(regex[idx], which_tag="start")
+                if tag_state:
+                    num_of_closing_tags -= 1
+                elif tag_state is False:
+                    num_of_closing_tags += 1
+        idx -= 1
+        if get_tag_name(regex[idx]) != iterator_tag_name:
+            print("Bad input regex!")
+            return None
+    end_idx = idx
+    if regex[end_idx][-1] == "*":
+        return regex
+    num_of_closing_tags = 1
+    while num_of_closing_tags > 0:
+        idx -= 1
+        if get_tag_name(regex[idx]) == iterator_tag_name:
+            tag_state = is_tag(regex[idx], which_tag="start")
+            if tag_state:
+                num_of_closing_tags -= 1
+            elif tag_state is False:
+                num_of_closing_tags += 1
+    start_idx = idx
+    before_regex = regex[0:start_idx]
+    if end_idx == len(regex) - 1:
+        after_regex = []
+    else:
+        after_regex = regex[end_idx + 1:]
+    iterator_regex[0] = "(" + iterator_regex[0]
+    iterator_regex[-1] = iterator_regex[-1] + ")*"
+    return before_regex + iterator_regex + after_regex
+
 
 # def compare_tree(wrapper_html, sample_html):
 #     """
