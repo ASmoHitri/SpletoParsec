@@ -76,7 +76,7 @@ li a:hover {
 </head>
 <body>
 
-<p>My first paragraph F.</p>
+<p class="test">My first paragraph F.</p>
 <p>My first paragraph E.</p>
 <p>My first paragraph D.</p>
 
@@ -115,7 +115,7 @@ def sanitize(dirty_html):
                   annoying_tags=True,
                   remove_unknown_tags=True,
                   safe_attrs_only=True,
-                  safe_attrs=frozenset(['src','color', 'href', 'title', 'class', 'name', 'id']),
+                  safe_attrs=frozenset([]),
                   remove_tags=('span', 'font', 'img')
                   )
     return cleaner.clean_html(dirty_html)
@@ -217,12 +217,6 @@ def is_end_tag(tag):
 
 html1, html2 = clean_up(html1, html2)
 html1 = html_to_list(html1)
-get_next_tag(html1, 1, "body")
-
-if __name__ == "__main__":
-    html1, html2 = clean_up(html1, html2)
-    html1 = html_to_list(html1)
-
 
 
 
