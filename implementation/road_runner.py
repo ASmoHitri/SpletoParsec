@@ -18,10 +18,36 @@ def get_next_item(html):
         return html[0:idx].strip(), html[idx:]
 
 
-def is_tag(string):
-    if string[0] == "<":
-        return True
-    return False
+def is_tag(input_str: str, which_tag='any'):
+    """
+    which tag can be start, end or any.
+    Returns None if input str is not a tag
+    """
+    test_tag = re.search("<(.*?)>", input_str)
+    if which_tag == 'any':
+        if test_tag:
+            return True
+        else:
+            return None
+    elif which_tag == 'start':
+        if not test_tag:
+            return None
+        test = re.search("<[^/](.*?)>", input_str)
+        if test:
+            return True
+        else:
+            return False
+    else:  # which_tag == 'end'
+        if not test_tag:
+            return None
+        test = re.search("</(.*?)>", input_str)
+        if test:
+            return True
+        else:
+            return False
+
+
+# is_tag(" </ lol banana > ", 'any')
 
 
 def get_iterator_square_candidate(tag_name, items_list, curr_idx):
@@ -84,14 +110,6 @@ def get_tag_name(input_str: str, get_all=False):
             id = id.group(1)
         return tag_name, class_name, id
     return tag_name
-
-
-def is_end_tag(input_str: str):
-    test = re.search("</(.*?)>", input_str)
-    if test:
-        return True
-    else:
-        return False
 
 
 def is_iterator(wrapper_list, sample_list):
