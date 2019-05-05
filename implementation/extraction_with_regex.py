@@ -64,9 +64,10 @@ def extract_from_rtvslo(file_name: str):
                     out += ' '+strng
             dataItem[key] = out[1:]
         else:
-            dataItem[key] = re.search(regex, html_content).group(1)
+            dataItem[key] = re.search(regex, html_content).group(1).strip()
     print(json.dumps(dataItem, indent=2, ensure_ascii=False))
     return json.dumps(dataItem, indent=2, ensure_ascii=False)
+
 
 def extract_from_ideo(file_name: str):
     html_content = open(base_content_path + file_name, 'r', encoding="latin-1").read()
@@ -76,14 +77,15 @@ def extract_from_ideo(file_name: str):
     price = """<div class="mobilno-skrij" style=.*>Spletna cena:</div>\s*<div class="cena" style=.*>(.*)<small>"""
     stock = "<span class=\"vprasaj_dobava\">\s*<a rel=.*>(.*)</a>"
 
-    titles = re.findall(title,html_content)
-    leads = re.findall(lead,html_content)
-    prices = re.findall(price,html_content)
-    stocks = re.findall(stock,html_content)
+    titles = re.findall(title, html_content)
+    leads = re.findall(lead, html_content)
+    prices = re.findall(price, html_content)
+    stocks = re.findall(stock, html_content)
 
-    data =[]
+    data = []
     for i in range(len(titles)):
-        data.append({"Title":titles[i], "Price":prices[i]+"€", "Lead":leads[i], "Stock": stocks[i]})
+        data.append({"Title": titles[i], "Price": prices[i] +
+                     "€", "Lead": leads[i], "Stock": stocks[i]})
 
     print(json.dumps(data, indent=2, ensure_ascii=False))
     return json.dumps(data, indent=2, ensure_ascii=False)
@@ -101,5 +103,3 @@ if __name__ == "__main__":
     extract_from_ideo("ideo.si/stroji za pometanje _ ideo.si.html")
 
     extract_from_ideo("ideo.si/Termostatski podometni kompleti _ ideo.si.html")
-
-
