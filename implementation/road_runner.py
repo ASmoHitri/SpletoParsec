@@ -191,26 +191,25 @@ def compare_tree(wrapper_list, sample_list):
                 curr_sample_tag_name = get_tag_name(next_item_s)
                 curr_wrapper_tag_name = get_tag_name(next_item_w)
 
-                iterator_candidate_list = None
-                iterator_idx = 0
+                # check if iterator
                 if curr_wrapper_tag_name == prev_tag_name_wrapper:
-                    iterator_candidate_list = wrapper_list
-                    square_candidate, new_idx = get_iterator_square_candidate(prev_tag_name_wrapper, iterator_candidate_list,
-                                                                              idxs[iterator_idx])
-                    upper_square = get_upper_square(iterator_candidate_list, idxs[iterator_idx])
+                    square_candidate, new_idx = get_iterator_square_candidate(prev_tag_name_wrapper, wrapper_list, idxs[0])
+                    upper_square = get_upper_square(wrapper_list, idxs[0])
                     iterator, iterator_regex = is_iterator(upper_square, square_candidate)
                     if iterator:
+                        # fix regex
+                        idxs[0] = new_idx
+                        continue
 
+                if curr_sample_tag_name == prev_tag_name_sample:
+                    square_candidate, new_idx = get_iterator_square_candidate(prev_tag_name_sample, sample_list, idxs[1])
+                    upper_square = get_upper_square(sample_list, idxs[1])
+                    iterator, iterator_regex = is_iterator(upper_square, square_candidate)
+                    if iterator:
+                        # fix regex
+                        idxs[1] = new_idx
+                        continue
 
-
-                elif curr_sample_tag_name == prev_tag_name_sample:
-                    iterator_candidate_list = sample_list
-                    iterator_idx = 1
-
-                if iterator_candidate_list:
-                    square_candidate, new_idx = get_iterator_square_candidate(prev_tag_name, iterator_candidate_list, idxs[iterator_idx])
-                    upper_square = get_upper_square(iterator_candidate_list, idxs[iterator_idx])
-                    # check if iterator
 
                 # not iterator --> optional -- cross matching
                 # TODO ne bo okkk, rabis indexe!!
