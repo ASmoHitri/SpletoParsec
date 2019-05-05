@@ -18,10 +18,36 @@ def get_next_item(html):
         return html[0:idx].strip(), html[idx:]
 
 
-def is_tag(string):
-    if string[0] == "<":
-        return True
-    return False
+def is_tag(input_str: str, which_tag='any'):
+    """
+    which tag can be start, end or any.
+    Returns None if input str is not a tag
+    """
+    test_tag = re.search("<(.*?)>", input_str)
+    if which_tag == 'any':
+        if test_tag:
+            return True
+        else:
+            return None
+    elif which_tag == 'start':
+        if not test_tag:
+            return None
+        test = re.search("<[^/](.*?)>", input_str)
+        if test:
+            return True
+        else:
+            return False
+    else:  # which_tag == 'end'
+        if not test_tag:
+            return None
+        test = re.search("</(.*?)>", input_str)
+        if test:
+            return True
+        else:
+            return False
+
+
+# is_tag(" </ lol banana > ", 'any')
 
 
 def get_iterator_square_candidate(tag_name, items_list, curr_idx):
@@ -158,6 +184,34 @@ def update_iterator_regex(regex, iterator_regex):
     return before_regex + iterator_regex + after_regex
 
 
+def is_end_tag(tag):
+    return tag[1] == "/"
+
+def get_next_tag(html_list, index, tag_name):
+    is_end = is_end_tag(html_list[index])
+    #is end tag, pogledamo prvega, ki se razlikuje
+    if is_end:
+        while True:
+            index += 1
+            if is_tag(html_list[index]):
+                return (index, get_tag_name(html_list[index]))
+
+    #is a start tag
+    else:
+        start_tags = 1
+        end_tags = 0
+        while True:
+            index += 1
+            if is_tag(html_list[index]):
+                if start_tags == end_tags:
+                    return (index, get_tag_name(html_list[index]))
+                elif is_end_tag(html_list[index]):
+                    end_tags += 1
+                else:
+                    start_tags += 1
+
+
+
 # def compare_tree(wrapper_html, sample_html):
 #     """
 #     :param wrapper_html: Wrapper HTML
@@ -222,6 +276,8 @@ def update_iterator_regex(regex, iterator_regex):
 #             wrapper_idx += 1
 #             sample_idx += 1
 #     return regex_list
+
+
 def compare_tree(wrapper_list, sample_list):
     """
     :param wrapper_list: Wrapper HTML list
@@ -253,7 +309,8 @@ def compare_tree(wrapper_list, sample_list):
 
                 # check if iterator
                 if curr_wrapper_tag_name == prev_tag_name_wrapper:
-                    square_candidate, new_idx = get_iterator_square_candidate(prev_tag_name_wrapper, wrapper_list, idxs[0])
+                    square_candidate, new_idx = get_iterator_square_candidate(
+                        prev_tag_name_wrapper, wrapper_list, idxs[0])
                     upper_square = get_upper_square(wrapper_list, idxs[0])
                     iterator, iterator_regex = is_iterator(upper_square, square_candidate)
                     if iterator:
@@ -262,7 +319,8 @@ def compare_tree(wrapper_list, sample_list):
                         continue
 
                 if curr_sample_tag_name == prev_tag_name_sample:
-                    square_candidate, new_idx = get_iterator_square_candidate(prev_tag_name_sample, sample_list, idxs[1])
+                    square_candidate, new_idx = get_iterator_square_candidate(
+                        prev_tag_name_sample, sample_list, idxs[1])
                     upper_square = get_upper_square(sample_list, idxs[1])
                     iterator, iterator_regex = is_iterator(upper_square, square_candidate)
                     if iterator:
@@ -312,4 +370,3 @@ if __name__ == "__main__":
 
     regex_str = "</?(\w*)[\s\S]*?>"
     print(re.search(regex_str, "</li class=jfke>").group(1))
-

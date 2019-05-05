@@ -116,7 +116,7 @@ def sanitize(dirty_html):
                   remove_unknown_tags=True,
                   safe_attrs_only=True,
                   safe_attrs=frozenset(['src','color', 'href', 'title', 'class', 'name', 'id']),
-                  remove_tags=('span', 'font', 'div')
+                  remove_tags=('span', 'font', 'img')
                   )
     return cleaner.clean_html(dirty_html)
 
@@ -206,6 +206,8 @@ def comapre_tree(wrapper, sample):
     return regex_list
 
 
+def is_end_tag(tag):
+    return tag[1] == "/"
 
 
 
@@ -213,8 +215,13 @@ def comapre_tree(wrapper, sample):
 
 
 
+html1, html2 = clean_up(html1, html2)
+html1 = html_to_list(html1)
+get_next_tag(html1, 1, "body")
 
-
+if __name__ == "__main__":
+    html1, html2 = clean_up(html1, html2)
+    html1 = html_to_list(html1)
 
 
 
