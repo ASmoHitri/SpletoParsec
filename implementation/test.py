@@ -209,29 +209,6 @@ def comapre_tree(wrapper, sample):
 def is_end_tag(tag):
     return tag[1] == "/"
 
-def get_next_tag(html_list, index, tag_name):
-    is_end = is_end_tag(html_list[index])
-    #is end tag, pogledamo prvega, ki se razlikuje
-    if is_end:
-        while True:
-            index += 1
-            if is_tag(html_list[index]):
-                return (index, get_tag_name(html_list[index]))
-
-    #is a start tag
-    else:
-        start_tags = 1
-        end_tags = 0
-        while True:
-            index += 1
-            if is_tag(html_list[index]):
-                if start_tags == end_tags:
-                    return (index, get_tag_name(html_list[index]))
-                elif is_end_tag(html_list[index]):
-                    end_tags += 1
-                else:
-                    start_tags += 1
-
 
 
 
