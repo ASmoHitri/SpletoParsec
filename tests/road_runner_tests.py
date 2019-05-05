@@ -16,10 +16,10 @@ class TestRoadRunnerMethods(unittest.TestCase):
         test_html = "</li></div>"
         self.assertEqual(("</li>", "</div>"), road_runner.get_next_item(test_html))
 
-    def test_is_tag(self):
-        self.assertEqual(False, road_runner.is_tag("nisem tag>"))           # False test
-        self.assertEqual(True, road_runner.is_tag("<tag>"))                 # True test - start tag
-        self.assertEqual(True, road_runner.is_tag("</tag>"))                # True test - end tag
+    # def test_is_tag(self):
+    #     self.assertEqual(False, road_runner.is_tag("nisem tag>"))           # False test
+    #     self.assertEqual(True, road_runner.is_tag("<tag>"))                 # True test - start tag
+    #     self.assertEqual(True, road_runner.is_tag("</tag>"))                # True test - end tag
 
     def test_get_iterator_square_candidate(self):
         # simple test
@@ -61,3 +61,14 @@ class TestRoadRunnerMethods(unittest.TestCase):
         # test with nested tags
         html_list = ["</p>", "<p>", "best text", "<p>", "inner text", "</p>", "</p>", "<p>"]
         self.assertEqual(["<p>", "best text", "<p>", "inner text", "</p>", "</p>"], road_runner.get_upper_square(html_list, 7))
+
+    def test_update_iterator_regex(self):
+        regex_list = ["<div>", "(.*?)", "(<img>", "r1", "r2", "</img>)?", "(<li>", "dfjsdf", "</li>)?"]
+        iterator_regex_list = ["<img>", "(.*?)", "</img>"]
+        self.assertEqual(["<div>", "(.*?)", "(<img>", "(.*?)", "</img>)*", "(<li>", "dfjsdf", "</li>)?"],
+                         road_runner.update_iterator_regex(regex_list, iterator_regex_list))
+
+        regex_list = ["<div>", "(.*?)", "(<img>", "r1", "r2", "</img>)*", "(<li>", "dfjsdf", "</li>)?"]
+        self.assertEqual(["<div>", "(.*?)", "(<img>", "r1", "r2", "</img>)*", "(<li>", "dfjsdf", "</li>)?"],
+                         road_runner.update_iterator_regex(regex_list, iterator_regex_list))
+
