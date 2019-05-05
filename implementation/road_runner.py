@@ -217,16 +217,40 @@ if __name__ == "__main__":
 def get_tag_name(tag):
     return re.search("<*(\w*)>", tag).group(1)
 
-#TODO: spremeni ime
-def get_sth(tag_name, html):
-    n_rows = 0 #stevilo vmrensih vrstic
-    while True:
-        next_item, html = get_next_item(html)
-        if is_tag(next_item):
-            if get_tag_name(next_item) == tag_name:
-                n_rows += 1
+def is_end_tag(tag):
+    return tag[1] == "/"
+
+def get_next_tag(html_list, index, tag_name):
+    is_end = is_end_tag(html_list[index])
+    #is end tag, pogledamo prvega, ki se razlikuje
+    if is_end:
+        while True:
+            index += 1
+            if is_tag(html_list[index]):
+                return (get_tag_name(html_list[index]), index)
+
+    #is a start tag
+    else:
+        start_tags = 1
+        end_tags = 0
+        while True:
+            if start_tags == end_tags:
+                while True:
+                    index += 1
+                    if is_tag(html_list[index]):
+                        return (get_tag_name(html_list[index]), index)
             else:
-                return next_item, n_rows
+                index += 1
+                if is_tag(html_list[index]):
+                    if is_end_tag(html_list[index]):
+                        end_tags += 1
+                    else:
+                        start_tags += 1
+
+
+
+
+
 
 
 
