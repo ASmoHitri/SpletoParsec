@@ -67,6 +67,25 @@ def get_upper_square(items_list, curr_idx):
     return items_list[idx:curr_idx]
 
 
+def get_tag_name(input_str: str, get_all=False):
+    """
+    returns tuple:
+    (tag_name, id_if_exists, class_if_exists) or (tag_name)
+    """
+    tag_name = re.search("</?(\w*)?[\s\S]*>", input_str)
+    if tag_name:
+        tag_name = tag_name.group(1)
+    if get_all:
+        class_name = re.search("<[\s\S]*class=\"(.*?)\"[\s\S]*>", input_str)
+        if class_name:
+            class_name = class_name.group(1)
+        id = re.search("<[\s\S]*id=\"(.*?)\"[\s\S]*>", input_str)
+        if id:
+            id = id.group(1)
+        return tag_name, class_name, id
+    return tag_name
+
+
 def is_iterator(wrapper_list, sample_list):
     regex_list = []
     wrapper_idx = 0
@@ -97,6 +116,12 @@ def is_iterator(wrapper_list, sample_list):
             sample_idx += 1
     return True, regex_list
 
+
+def update_iterator_regex(regex, iterator_regex):
+    idx = len(regex) - 1
+    iterator_tag_name = get_tag_name(iterator_regex[0])
+    if get_tag_name(regex[-1]) == iterator_tag_name:
+        pass
 
 # def compare_tree(wrapper_html, sample_html):
 #     """
@@ -210,7 +235,6 @@ def compare_tree(wrapper_list, sample_list):
                         idxs[1] = new_idx
                         continue
 
-
                 # not iterator --> optional -- cross matching
                 # TODO ne bo okkk, rabis indexe!!
                 # wrapper_next = get_next_different_tag(curr_wrapper_tag_name, wrapper_html)
@@ -253,24 +277,4 @@ if __name__ == "__main__":
 
     regex_str = "</?(\w*)[\s\S]*?>"
     print(re.search(regex_str, "</li class=jfke>").group(1))
-
-def get_tag_name(tag):
-    return re.search("<*(\w*)>", tag).group(1)
-
-#TODO: spremeni ime
-def get_sth(tag_name, html):
-    n_rows = 0 #stevilo vmrensih vrstic
-    while True:
-        next_item, html = get_next_item(html)
-        if is_tag(next_item):
-            if get_tag_name(next_item) == tag_name:
-                n_rows += 1
-            else:
-                return next_item, n_rows
-
-
-
-
-
-
 
