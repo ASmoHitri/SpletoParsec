@@ -33,7 +33,15 @@ def is_tag(input_str: str, which_tag='any'):
     elif which_tag == 'start':
         if not test_tag:
             return None
-        test = re.search("<[^/](.*?)>", input_str)
+        test = re.search("<[^/](.*?)[^/]>", input_str)
+        if test:
+            return True
+        else:
+            return False
+    elif which_tag == 'both':
+        if not test_tag:
+            return None
+        test = re.search("<(.*?)/>", input_str)
         if test:
             return True
         else:
@@ -41,11 +49,14 @@ def is_tag(input_str: str, which_tag='any'):
     else:  # which_tag == 'end'
         if not test_tag:
             return None
-        test = re.search("</(.*?)>", input_str)
+        test = re.search("</(.*?)[^/]>", input_str)
         if test:
             return True
         else:
             return False
+
+
+is_tag("<  img  sranje 4y7h3p78gp 9hrgu   55%%%  />", 'both')
 
 
 def get_iterator_square_candidate(tag_name, items_list, curr_idx):
