@@ -33,15 +33,11 @@ def is_tag(input_str: str, which_tag='any'):
     elif which_tag == 'start':
         if not test_tag:
             return None
-        test = re.search("<[^/](.*?)[^/]>", input_str)
-        if test:
-            return True
-        else:
-            return False
+        return not is_tag(input_str, 'both') and not is_tag(input_str, 'end')
     elif which_tag == 'both':
         if not test_tag:
             return None
-        test = re.search("<(.*?)/>", input_str)
+        test = re.search("<([^/].*?/)>", input_str)
         if test:
             return True
         else:
@@ -49,14 +45,11 @@ def is_tag(input_str: str, which_tag='any'):
     else:  # which_tag == 'end'
         if not test_tag:
             return None
-        test = re.search("</(.*?)[^/]>", input_str)
+        test = re.search("<(/.*?[^/])>", input_str)
         if test:
             return True
         else:
             return False
-
-
-is_tag("<  img  sranje 4y7h3p78gp 9hrgu   55%%%  />", 'both')
 
 
 def get_iterator_square_candidate(tag_name, items_list, curr_idx):
@@ -198,7 +191,7 @@ def get_next_tag(html_list, index):
                 return None
             if is_tag(html_list[index]):
                 return (index, get_tag_name(html_list[index]))
-    #is both
+    # is both
     elif is_tag(html_list[index], which_tag='both'):
         while True:
             index += 1
@@ -397,6 +390,12 @@ def clean_up(html1, html2):
     html1 = html1_bs.prettify()
     html2 = html2_bs.prettify()
     return html1, html2
+
+
+def replace_tags(input_string: str):
+    input_string = re.sub("<(.*?[^/])>", "<\g<1>.*?>", input_string)
+    input_string = re.sub("<(.*?)/>", "<\g<1>.*?/>", input_string)
+    return input_string
 
 
 def get_wrapper(file_name1, file_name2, encoding="utf-8"):
