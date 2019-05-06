@@ -195,7 +195,14 @@ def get_next_tag(html_list, index):
                 return None
             if is_tag(html_list[index]):
                 return (index, get_tag_name(html_list[index]))
-
+    #is both
+    elif is_tag(html_list[index], which_tag='both'):
+        while True:
+            index += 1
+            if index >= len(html_list):
+                return None
+            if is_tag(html_list[index]):
+                return (index, get_tag_name(html_list[index]))
     # is a start tag
     else:
         start_tags = 1
