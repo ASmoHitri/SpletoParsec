@@ -1,4 +1,5 @@
 import re
+import bs4
 from lxml.html.clean import Cleaner
 base_content_path = "../input/"
 
@@ -47,9 +48,6 @@ def is_tag(input_str: str, which_tag='any'):
             return False
 
 
-# is_tag(" </ lol banana > ", 'any')
-
-
 def get_iterator_square_candidate(tag_name, items_list, curr_idx):
     num_of_opening_tags = 1
     square_list = ["<{}>".format(tag_name)]
@@ -62,14 +60,6 @@ def get_iterator_square_candidate(tag_name, items_list, curr_idx):
             num_of_opening_tags += 1
         square_list.append(next_item)
     return square_list, curr_idx
-
-
-def get_next_different_tag(tag_name, html):
-    regex = "(?<=</{0}>)\s*(</?[^{0}]>)".format(tag_name)
-    match = re.search(regex, html)
-    if match:
-        return match.group(1)
-    return None
 
 
 def get_previous_tag_name(items_list, curr_idx):
@@ -184,16 +174,16 @@ def update_iterator_regex(regex, iterator_regex):
     return before_regex + iterator_regex + after_regex
 
 
-def get_next_tag(html_list, index, tag_name):
+def get_next_tag(html_list, index):
     is_end = is_tag(html_list[index], which_tag='end')
-    #is end tag, pogledamo prvega, ki se razlikuje
+    # is end tag, pogledamo prvega, ki se razlikuje
     if is_end:
         while True:
             index += 1
             if is_tag(html_list[index]):
                 return (index, get_tag_name(html_list[index]))
 
-    #is a start tag
+    # is a start tag
     else:
         start_tags = 1
         end_tags = 0
@@ -206,8 +196,6 @@ def get_next_tag(html_list, index, tag_name):
                     end_tags += 1
                 else:
                     start_tags += 1
-
-
 
 # def compare_tree(wrapper_html, sample_html):
 #     """
@@ -312,7 +300,8 @@ def compare_tree(wrapper_list, sample_list):
                     iterator, iterator_regex = is_iterator(upper_square, square_candidate)
                     if iterator:
                         # fix regex
-                        idxs[0] = new_idx
+                        regex_list = update_iterator_regex(regex_list, iterator_regex)
+                        idxs[0] = new_idx + 1
                         continue
 
                 if curr_sample_tag_name == prev_tag_name_sample:
@@ -322,14 +311,27 @@ def compare_tree(wrapper_list, sample_list):
                     iterator, iterator_regex = is_iterator(upper_square, square_candidate)
                     if iterator:
                         # fix regex
-                        idxs[1] = new_idx
+                        regex_list = update_iterator_regex(regex_list, iterator_regex)
+                        idxs[1] = new_idx + 1
                         continue
 
                 # not iterator --> optional -- cross matching
-                # TODO ne bo okkk, rabis indexe!!
-                # wrapper_next = get_next_different_tag(curr_wrapper_tag_name, wrapper_html)
-                # sample_next = get_next_different_tag(curr_sample_tag_name, sample_html)
-
+                new_wrapper_idx, wrapper_next_tag = get_next_tag(wrapper_list, idxs[0])
+                new_sample_idx, sample_next_tag = get_next_tag(sample_list, idxs[1])
+                if wrapper_next_tag == curr_sample_tag_name:
+                    # sample is optional
+                    regex_to_add = sample_list[idxs[1]:new_sample_idx]
+                    regex_to_add[0] = "(" + regex_to_add[0]
+                    regex_to_add[-1] = regex_to_add[-1] + ")?"
+                    regex_list = regex_list + regex_to_add
+                    idxs[1] = new_sample_idx
+                if sample_next_tag == curr_wrapper_tag_name:
+                    # wrapper is optional
+                    regex_to_add = wrapper_list[idxs[0]:new_sample_idx]
+                    regex_to_add[0] = "(" + regex_to_add[0]
+                    regex_to_add[-1] = regex_to_add[-1] + ")?"
+                    regex_list = regex_list + regex_to_add
+                    idxs[0] = new_wrapper_idx
             else:
                 # string-tag mismatch --> sample string
                 regex_list.append("(.*?)")
@@ -346,24 +348,43 @@ def compare_tree(wrapper_list, sample_list):
     return regex_list
 
 
+def html_to_list(html):
+    """Input must be  a prettifyed html"""
+    html_list = []
+    while html:
+        next_item, html = get_next_item(html)
+        if next_item == "":
+            continue
+        else:
+            html_list.append(next_item)
+    return html_list
+
+
+def clean_up(html1, html2):
+    #remove the not necessary stuff
+    cleaner = Cleaner(page_structure=False, safe_attrs=frozenset([]), )
+    html1 = cleaner.clean_html(html1)
+    html2 = cleaner.clean_html(html2)
+    #transform to bs
+    html1_bs = bs4.BeautifulSoup(html1)
+    html2_bs = bs4.BeautifulSoup(html2)
+    html1 = html1_bs.prettify()
+    html2 = html2_bs.prettify()
+    return html1, html2
+
+
 def get_wrapper(file_name1, file_name2, encoding="utf-8"):
     wrapper_content = open(base_content_path + file_name1, 'r', encoding=encoding).read()
     sample_content = open(base_content_path + file_name2, 'r', encoding=encoding).read()
-    # wrapper_soup = BeautifulSoup(wrapper_content, 'html.parser')
-    # sample_soup = BeautifulSoup(sample_content, 'html.parser')
-    cleaner = Cleaner(page_structure=False)
-    wrapper_content = cleaner.clean_html(wrapper_content)
-    sample_content = cleaner.clean_html(sample_content)
-
-    compare_tree(wrapper_content, sample_content, )
+    wrapper_content, sample_content = clean_up(wrapper_content, sample_content)
+    wrapper = html_to_list(wrapper_content)
+    sample = html_to_list(sample_content)
+    regex_list = compare_tree(wrapper, sample)
+    regex = ""
+    for regex_part in regex_list:
+        regex += regex_part
+    return regex
 
 
 if __name__ == "__main__":
-    # get_wrapper("neki", "neki")
-
-    html = "<li>		dfjsdf		<i> </i>	</li>	<li>		ldkfpfadgr		</li>	<p>\
-     class=\"fgjtr\">		hdhrfrh	</p></div>"
-    # print(get_next_different_tag("li", html))
-
-    regex_str = "</?(\w*)[\s\S]*?>"
-    print(re.search(regex_str, "</li class=jfke>").group(1))
+    print(get_wrapper("../tests/test_html1.html", "../tests/test_html1.html"))
