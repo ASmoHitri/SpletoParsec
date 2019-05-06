@@ -56,9 +56,6 @@ def is_tag(input_str: str, which_tag='any'):
             return False
 
 
-is_tag("<  img  sranje 4y7h3p78gp 9hrgu   55%%%  />", 'both')
-
-
 def get_iterator_square_candidate(tag_name, items_list, curr_idx):
     num_of_opening_tags = 1
     square_list = [items_list[curr_idx]]

@@ -40,10 +40,6 @@ class TestRoadRunnerMethods(unittest.TestCase):
         self.assertEqual((["<p>", "some item", "<p>", "test text", '</p>', "</p>"], 5),
                          road_runner.get_iterator_square_candidate("p", test_html, 0))
 
-    def test_get_next_different_tag(self):
-        # TODO
-        pass
-
     def test_get_previous_tag_name(self):
         # no string between test
         html_list = ["<li>", "best item", "</li>", "<div>"]
