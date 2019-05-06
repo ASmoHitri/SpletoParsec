@@ -50,14 +50,17 @@ def is_tag(input_str: str, which_tag='any'):
 
 def get_iterator_square_candidate(tag_name, items_list, curr_idx):
     num_of_opening_tags = 1
-    square_list = ["<{}>".format(tag_name)]
-    while num_of_opening_tags > 0:
+    square_list = [items_list[curr_idx]]
+    while num_of_opening_tags > 0 and curr_idx < len(items_list) - 1:
         curr_idx = curr_idx + 1
         next_item = items_list[curr_idx]
-        if next_item == "</{}>".format(tag_name):
-            num_of_opening_tags -= 1
-        elif next_item == "<{}>".format(tag_name):
-            num_of_opening_tags += 1
+        tag = is_tag(next_item, which_tag="start")
+        if tag is not None:
+            if get_tag_name(next_item) == tag_name:
+                if tag:
+                    num_of_opening_tags += 1
+                else:
+                    num_of_opening_tags -= 1
         square_list.append(next_item)
     return square_list, curr_idx
 
@@ -361,11 +364,11 @@ def html_to_list(html):
 
 
 def clean_up(html1, html2):
-    #remove the not necessary stuff
+    # remove the not necessary stuff
     cleaner = Cleaner(page_structure=False, style=True, safe_attrs=frozenset([]), )
     html1 = cleaner.clean_html(html1)
     html2 = cleaner.clean_html(html2)
-    #transform to bs
+    # transform to bs
     html1_bs = bs4.BeautifulSoup(html1, "lxml")
     html2_bs = bs4.BeautifulSoup(html2, "lxml")
     html1 = html1_bs.prettify()
