@@ -183,6 +183,8 @@ def get_next_tag(html_list, index):
     if is_end:
         while True:
             index += 1
+            if index >= len(html_list):
+                return None
             if is_tag(html_list[index]):
                 return (index, get_tag_name(html_list[index]))
 
@@ -192,6 +194,8 @@ def get_next_tag(html_list, index):
         end_tags = 0
         while True:
             index += 1
+            if index >= len(html_list):
+                return None
             if is_tag(html_list[index]):
                 if start_tags == end_tags:
                     return (index, get_tag_name(html_list[index]))
@@ -322,19 +326,20 @@ def compare_tree(wrapper_list, sample_list):
                 new_wrapper_idx, wrapper_next_tag = get_next_tag(wrapper_list, idxs[0])
                 new_sample_idx, sample_next_tag = get_next_tag(sample_list, idxs[1])
                 if wrapper_next_tag == curr_sample_tag_name:
+                    # wrapper is optional
+                    regex_to_add = wrapper_list[idxs[0]:new_wrapper_idx]
+                    regex_to_add[0] = "(" + regex_to_add[0]
+                    regex_to_add[-1] = regex_to_add[-1] + ")?"
+                    regex_list = regex_list + regex_to_add
+                    idxs[0] = new_wrapper_idx
+                if sample_next_tag == curr_wrapper_tag_name:
                     # sample is optional
                     regex_to_add = sample_list[idxs[1]:new_sample_idx]
                     regex_to_add[0] = "(" + regex_to_add[0]
                     regex_to_add[-1] = regex_to_add[-1] + ")?"
                     regex_list = regex_list + regex_to_add
                     idxs[1] = new_sample_idx
-                if sample_next_tag == curr_wrapper_tag_name:
-                    # wrapper is optional
-                    regex_to_add = wrapper_list[idxs[0]:new_sample_idx]
-                    regex_to_add[0] = "(" + regex_to_add[0]
-                    regex_to_add[-1] = regex_to_add[-1] + ")?"
-                    regex_list = regex_list + regex_to_add
-                    idxs[0] = new_wrapper_idx
+
             else:
                 # string-tag mismatch --> sample string
                 regex_list.append("(.*?)")
@@ -380,6 +385,9 @@ def get_wrapper(file_name1, file_name2, encoding="utf-8"):
     wrapper_content = open(base_content_path + file_name1, 'r', encoding=encoding).read()
     sample_content = open(base_content_path + file_name2, 'r', encoding=encoding).read()
     wrapper_content, sample_content = clean_up(wrapper_content, sample_content)
+    print(wrapper_content)
+    print("-------------------------------------------------------")
+    print(sample_content)
     wrapper = html_to_list(wrapper_content)
     sample = html_to_list(sample_content)
     regex_list = compare_tree(wrapper, sample)
@@ -391,9 +399,12 @@ def get_wrapper(file_name1, file_name2, encoding="utf-8"):
 
 if __name__ == "__main__":
     # file1 = "../tests/test_html1.html"
-    # file2 = "../tests/test_html1.html"
+    # file2 = "../tests/test_html2.html"
     # file1 = "../input/rtvslo.si/Audi.html"
     # file2 = "../input/rtvslo.si/Volvo.html"
-    file1 = "../input/overstock.com/jewelry01.html"
-    file2 = "../input/overstock.com/jewelry02.html"
-    print(get_wrapper(file1, file2, encoding="Latin-1"))
+    # file1 = "../input/overstock.com/jewelry01.html"
+    # file2 = "../input/overstock.com/jewelry02.html"
+    file1 = "../tests/html_example1.html"
+    file2 = "../tests/html_example2.html"
+
+    print(get_wrapper(file1, file2))
