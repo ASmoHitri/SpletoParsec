@@ -300,8 +300,12 @@ def compare_tree(wrapper_list, sample_list):
     sample_len = len(sample_list)
 
     while idxs[0] < wrapper_len and idxs[1] < sample_len:
+        print("Super regex, ", regex_list)
         next_item_w = wrapper_list[idxs[0]]
         next_item_s = sample_list[idxs[1]]
+
+        print("w",next_item_w)
+        print("s", next_item_s)
 
         # check whether the same or mismatch
         if next_item_w == next_item_s:
@@ -318,7 +322,7 @@ def compare_tree(wrapper_list, sample_list):
                 curr_wrapper_tag_name = get_tag_name(next_item_w)
 
                 # check if iterator
-                if curr_wrapper_tag_name == prev_tag_name_wrapper:
+                if is_tag(next_item_w, which_tag="start") and curr_wrapper_tag_name == prev_tag_name_wrapper:
                     square_candidate, new_idx = get_iterator_square_candidate(
                         prev_tag_name_wrapper, wrapper_list, idxs[0])
                     upper_square = get_upper_square(wrapper_list, idxs[0])
@@ -329,7 +333,7 @@ def compare_tree(wrapper_list, sample_list):
                         idxs[0] = new_idx + 1
                         continue
 
-                if curr_sample_tag_name == prev_tag_name_sample:
+                if is_tag(next_item_s, which_tag="start") and curr_sample_tag_name == prev_tag_name_sample:
                     square_candidate, new_idx = get_iterator_square_candidate(
                         prev_tag_name_sample, sample_list, idxs[1])
                     upper_square = get_upper_square(sample_list, idxs[1])
@@ -358,6 +362,20 @@ def compare_tree(wrapper_list, sample_list):
                     regex_list = regex_list + regex_to_add
                     idxs[1] = new_sample_idx
 
+                if sample_next_tag != curr_wrapper_tag_name and wrapper_next_tag != curr_sample_tag_name:
+                    # wrapper is optional
+                    regex_to_add = wrapper_list[idxs[0]:new_wrapper_idx]
+                    regex_to_add[0] = "(" + regex_to_add[0]
+                    regex_to_add[-1] = regex_to_add[-1] + ")?"
+                    regex_list = regex_list + regex_to_add
+                    idxs[0] = new_wrapper_idx
+
+                    # sample is optional
+                    regex_to_add = sample_list[idxs[1]:new_sample_idx]
+                    regex_to_add[0] = "(" + regex_to_add[0]
+                    regex_to_add[-1] = regex_to_add[-1] + ")?"
+                    regex_list = regex_list + regex_to_add
+                    idxs[1] = new_sample_idx
             else:
                 # string-tag mismatch --> sample string
                 regex_list.append("(.*?)")
@@ -409,9 +427,9 @@ def get_wrapper(file_name1, file_name2, encoding="utf-8"):
     wrapper_content = open(base_content_path + file_name1, 'r', encoding=encoding).read()
     sample_content = open(base_content_path + file_name2, 'r', encoding=encoding).read()
     wrapper_content, sample_content = clean_up(wrapper_content, sample_content)
-    print(wrapper_content)
-    print("-------------------------------------------------------")
-    print(sample_content)
+    # print(wrapper_content)
+    # print("-------------------------------------------------------")
+    # print(sample_content)
     wrapper = html_to_list(wrapper_content)
     sample = html_to_list(sample_content)
     regex_list = compare_tree(wrapper, sample)
@@ -426,10 +444,22 @@ if __name__ == "__main__":
     # file2 = "../tests/test_html2.html"
     # file1 = "../input/rtvslo.si/Audi.html"
     # file2 = "../input/rtvslo.si/Volvo.html"
-    # file1 = "../input/overstock.com/jewelry01.html"
-    # file2 = "../input/overstock.com/jewelry02.html"
-    file1 = "../tests/html_example1.html"
-    file2 = "../tests/html_example2.html"
+    file1 = "../input/overstock.com/jewelry01.html"
+    file2 = "../input/overstock.com/jewelry02.html"
+    # file1 = "../tests/html_example1.html"
+    # file2 = "../tests/html_example2.html"
 
-    print()
-    print(get_wrapper(file1, file2))
+    # output_regex = get_wrapper(file1, file2, encoding="latin-1")
+    # output_regex = replace_tags(output_regex)
+    # print()
+    # print(output_regex)
+
+    reggexxx = ['<html>', '<head>', '<title>', 'Overstock.com, save up to 80% every day!', '</title>', '</head>', '<body>', '<table>', '<tbody>', '<tr>', '<td>', '</td>', '<td>', '<table>', '<tbody>', '<tr>', '<td>', '<table>', '<tbody>', '<tr>', '<td>', '<a>', '<img/>', '</a>', '</td>', '<td>', '<img/>', '</td>', '<td>', '<a>', '<img/>', '</a>', '</td>', '</tr>', '</tbody>', '</table>', '<map>', '<area/>', '<area/>', '<area/>', '<area/>', '<area/>', '</map>', '</td>', '</tr>', '<tr>', '<td>', '<a>', '<img/>', '</a>', '<a>', '<img/>', '</a>', '<a>', '<img/>', '</a>', '<a>', '<img/>', '</a>', '<a>', '<img/>', '</a>', '<a>', '<img/>', '</a>', '<a>', '<img/>', '</a>', '</td>', '</tr>', '</tbody>', '</table>', '</td>', '</tr>', '<tr>', '<td>', '<img/>', '</td>', '</tr>', '<tr>', '<td>', '<table>', '<tbody>', '<tr>', '<td>', '<table>', '<tbody>', '<tr>', '<td>', '<span>', 'Search:', '</span>', '</td>', '<td>', '</td>', '<td>', '</td>', '<td>', '</td>', '</tr>', '</tbody>', '</table>', '</td>', '<td>', '<img/>', '<br/>', '<a>', '<img/>', '</a>', '</td>', '<td>', '<img/>', '</td>', '</tr>', '</tbody>', '</table>', '</td>', '</tr>', '<tr>', '<td>', '<img/>', '</td>', '</tr>', '</tbody>', '</table>', '<table>', '<tbody>', '<tr>', '<td>', '<img/>', '</td>', '<td>', '<br/>', '<table>', '<tbody>', '<tr>', '<td>', '<table>', '<tbody>', '<tr>', '<td>', '</td>', '<td>', '<span>', '<b>', '(.*?)', '</b>', '</span>', '</td>', '</tr>', '<tr>', '<td>', '</td>', '<td>', '<a>', '(.*?)', '</a>', '</td>', '</tr>', '<tr>', '<td>', '</td>', '<td>', '<a>', '(.*?)', '</a>', '</td>', '</tr>', '<tr>', '<td>', '</td>', '<td>', '<a>', '(.*?)', '</a>', '</td>', '</tr>', '<tr>', '<td>', '</td>', '<td>', '<a>', '(.*?)', '</a>', '</td>', '</tr>', '(<tr>', '<td>', '</td>', '<td>', '<a>', '(.*?)', '</a>', '</td>', '</tr>)*', '(<tr>', '<td>', '</td>', '<td>', '<a>', '<b>', 'View All', '</b>', '</a>', '</td>', '</tr>)?', '</tbody>', '</table>', '</td>', '</tr>', '</tbody>', '</table>', '<br/>', '<span>', '<b>', 'Stores', '</b>', '</span>', '<br/>', '<table>', '<tbody>', '<tr>', '<td>', '<a>', 'Apparel, Shoes &amp; Access.', '</a>', '</td>', '</tr>', '<tr>', '<td>', '<a>', 'Books, Movies, CDs, Games', '</a>', '</td>', '</tr>', '<tr>', '<td>', '<a>', 'Electronics &amp; Computers', '</a>', '</td>', '</tr>', '<tr>', '<td>', '<a>', 'Home &amp; Garden', '</a>', '</td>', '</tr>', '<tr>', '<td>', '<a>', '<b>', 'Jewelry, Watches &amp; Gifts', '</b>', '</a>', '</td>', '</tr>', '<tr>', '<td>', '<a>', 'Sports, Travel &amp; Toys', '</a>', '</td>', '</tr>', '<tr>', '<td>', '<a>', 'Worldstock', '</a>', '</td>', '</tr>', '</tbody>', '</table>', '<br/>', '<span>', '<b>', 'New Stock', '</b>', '</span>', '<br/>', '<table>', '<tbody>', '<tr>', '<td>', '<a>', 'Ralph Lauren $29.95', '</a>', '</td>', '</tr>', '<tr>', '<td>', '<a>', 'Ben Sherman 53% off', '</a>', '</td>', '</tr>', '<tr>', '<td>', '<a>', 'Pre-order Harry Potter DVD', '</a>', '</td>', '</tr>', '<tr>', '<td>', '<a>', 'HP 2GHz System $499', '</a>', '</td>', '</tr>', '<tr>', '<td>', '<a>', 'New Items within 7 Days', '</a>', '</td>', '</tr>', '</tbody>', '</table>', '<br/>', '<span>', '<b>', 'Customer Service', '</b>', '</span>', '<br/>', '<table>', '<tbody>', '<tr>', '<td>', '<a>', 'Shopping Cart &amp; Checkout', '</a>', '</td>', '</tr>', '<tr>', '<td>', '<a>', 'Track Your Order', '</a>', '</td>', '</tr>', '<tr>', '<td>', '<a>', 'Your Account', '</a>', '</td>', '</tr>', '<tr>', '<td>', '<a>', 'Help &amp; FAQ', '</a>', '</td>', '</tr>', '<tr>', '<td>', '<a>', 'Best Price Guarantee', '</a>', '</td>', '</tr>', '</tbody>', '</table>', '<br/>', '<span>', '<b>', 'About Us', '</b>', '</span>', '<br/>', '<table>', '<tbody>', '<tr>', '<td>', '<a>', 'About Us', '</a>', '</td>', '</tr>', '<tr>', '<td>', '<a>', 'Privacy &amp; Security', '</a>', '</td>', '</tr>', '<tr>', '<td>', '<a>', 'Terms &amp; Conditions', '</a>', '</td>', '</tr>', '<tr>', '<td>', '<a>', 'Become An Affiliate', '</a>', '</td>', '</tr>', '<tr>', '<td>', '<a>', 'Business Purchases', '</a>', '</td>', '</tr>', '<tr>', '<td>', '<a>', 'Have Products to Sell?', '</a>', '</td>', '</tr>', '<tr>', '<td>', '<a>', 'Investor Relations', '</a>', '</td>', '</tr>', '</tbody>', '</table>', '<img/>', '<br/>', '</td>', '<td>', '<img/>', '</td>', '<td>', '<img/>', '</td>', '<td>', '<br/>', '<b>', '<a>', 'Jewelry, Watches &amp; Gifts', '</a>', '&gt;', '<a>', 'Jewelry', '</a>', '&gt;', '<a>', '(.*?)', '</a>', '&gt; View All', '</b>', '<br/>', '<table>', '<tbody>', '<tr>', '<td>', '<br/>', '<table>', '<tbody>', '<tr>', '<td>', '<table>', '<tbody>', '<tr>', '<td>', '<span>', '<b>', 'List Sorted By:', '</b>', '</span>', '</td>', '<td>', '<b>', 'Top Sellers', '</b>', '|', '<a>', 'Discount', '</a>', '|', '<a>', 'Newest First', '</a>', '|', '<a>', 'Price', '</a>', '|', '<a>', 'Quantity', '</a>', '|', '<a>', 'Markdowns', '</a>', '</td>', '</tr>', '(<tr>', '<td>', '<span>', '<b>', 'Items:', '</b>', '</span>', '</td>', '<td>', '<b>', '16', '</b>', '-', '<b>', '30', '</b>', 'of', '<b>', '296', '</b>', '|', '<a>', 'First Page', '</a>', '|', '<a>', 'Previous 15', '</a>', '|', '<a>', 'Next 15', '</a>', '</td>', '</tr>)?', '</tbody>', '</table>', '</td>', '</tr>', '</tbody>', '</table>', '</td>', '</tr>', '<tr>', '<td>', '<table>', '<tbody>', '<tr>', '<td>', '<table>', '<tbody>', '<tr>', '<td>', '<table>', '<tbody>', '<tr>', '<td>', '<a>', '<img/>', '</a>', '</td>', '</tr>', '<tr>', '<td>', '<a>', 'More Info...', '</a>', '</td>', '</tr>', '</tbody>', '</table>', '</td>', '<td>', '<a>', '<b>', '(.*?)', '</b>', '</a>', '<br/>', '<table>', '<tbody>', '<tr>', '<td>', '<table>', '<tbody>', '<tr>', '<td>', '<b>', 'List Price:', '</b>', '</td>', '<td>', '<s>', '(.*?)', '</s>', '</td>', '</tr>', '<tr>', '<td>', '<b>', 'Price:', '</b>', '</td>', '<td>', '<span>', '<b>', '(.*?)', '</b>', '</span>', '</td>', '</tr>', '<tr>', '<td>', '<b>', 'You Save:', '</b>', '</td>', '<td>', '<span>', '(.*?)', '</span>', '</td>', '</tr>', '</tbody>', '</table>', '</td>', '<td>', '<span>', '(.*?)', '<br/>', '<a>', '<span>', '<b>', 'Click here to purchase.', '</b>', '</span>', '</a>', '</span>', '<br/>', '(</td>)?', '(<table>', '<tbody>', '<tr>', '<td>', '<a>', '<img/>', '</a>', '</td>', '</tr>', '</tbody>', '</table>', '</td>)?', '</tr>', '</tbody>', '</table>', '</td>', '</tr>', '<tr>', '<td>', '<img/>', '</td>', '</tr>', '<tr>', '<td>', '<table>', '<tbody>', '<tr>', '<td>', '<a>', '<img/>', '</a>', '</td>', '</tr>', '<tr>', '<td>', '<a>', 'More Info...', '</a>', '</td>', '</tr>', '</tbody>', '</table>', '</td>', '<td>', '<a>', '<b>', '(.*?)', '</b>', '</a>', '<br/>', '<table>', '<tbody>', '<tr>', '<td>', '<table>', '<tbody>', '<tr>', '<td>', '<b>', 'List Price:', '</b>', '</td>', '<td>', '<s>', '(.*?)', '</s>', '</td>', '</tr>', '<tr>', '<td>', '<b>', 'Price:', '</b>', '</td>', '<td>', '<span>', '<b>', '(.*?)', '</b>', '</span>', '</td>', '</tr>', '<tr>', '<td>', '<b>', 'You Save:', '</b>', '</td>', '<td>', '<span>', '(.*?)', '</span>', '</td>', '</tr>', '</tbody>', '</table>', '</td>', '<td>', '<span>', '(.*?)', '<br/>', '<a>', '<span>', '<b>', 'Click here to purchase.', '</b>', '</span>', '</a>', '</span>', '<br/>', '</td>', '</tr>', '</tbody>', '</table>', '</td>', '</tr>', '<tr>', '<td>', '<img/>', '</td>', '</tr>', '<tr>', '<td>', '<table>', '<tbody>', '<tr>', '<td>', '<a>', '<img/>', '</a>', '</td>', '</tr>', '<tr>', '<td>', '<a>', 'More Info...', '</a>', '</td>', '</tr>', '</tbody>', '</table>', '</td>', '<td>', '<a>', '<b>', '(.*?)', '</b>', '</a>', '<br/>', '<table>', '<tbody>', '<tr>', '<td>', '<table>', '<tbody>', '<tr>', '<td>', '<b>', 'List Price:', '</b>', '</td>', '<td>', '<s>', '(.*?)', '</s>', '</td>', '</tr>', '<tr>', '<td>', '<b>', 'Price:', '</b>', '</td>', '<td>', '<span>', '<b>', '(.*?)', '</b>', '</span>', '</td>', '</tr>', '<tr>', '<td>', '<b>', 'You Save:', '</b>', '</td>', '<td>', '<span>', '(.*?)', '</span>', '</td>', '</tr>', '</tbody>', '</table>', '</td>', '<td>', '<span>', '(.*?)', '<br/>', '<a>', '<span>', '<b>', 'Click here to purchase.', '</b>', '</span>', '</a>', '</span>', '<br/>', '</td>', '</tr>', '</tbody>', '</table>', '</td>', '</tr>', '<tr>', '<td>', '<img/>', '</td>', '</tr>', '<tr>', '<td>', '<table>', '<tbody>', '<tr>', '<td>', '<a>', '<img/>', '</a>', '</td>', '</tr>', '<tr>', '<td>', '<a>', 'More Info...', '</a>', '</td>', '</tr>', '</tbody>', '</table>', '</td>', '<td>', '<a>', '<b>', '(.*?)', '</b>', '</a>', '<br/>', '<table>', '<tbody>', '<tr>', '<td>', '<table>', '<tbody>', '<tr>', '<td>', '<b>', 'List Price:', '</b>', '</td>', '<td>', '<s>', '(.*?)', '</s>', '</td>', '</tr>', '<tr>', '<td>', '<b>', 'Price:', '</b>', '</td>', '<td>', '<span>', '<b>', '(.*?)', '</b>', '</span>', '</td>', '</tr>', '<tr>', '<td>', '<b>', 'You Save:', '</b>', '</td>', '<td>', '<span>', '(.*?)', '</span>', '</td>', '</tr>', '</tbody>', '</table>', '</td>', '<td>', '<span>', '(.*?)', '<br/>', '<a>', '<span>', '<b>', 'Click here to purchase.', '</b>', '</span>', '</a>', '</span>', '<br/>', '(<table>', '<tbody>', '<tr>', '<td>', '<a>', '<img/>', '</a>', '</td>', '</tr>', '</tbody>', '</table>', '</td>)?', '(</td>)?', '</tr>', '</tbody>', '</table>', '</td>', '</tr>', '<tr>', '<td>', '<img/>', '</td>', '</tr>', '<tr>', '<td>', '<table>', '<tbody>', '<tr>', '<td>', '<a>', '<img/>', '</a>', '</td>', '</tr>', '<tr>', '<td>', '<a>', 'More Info...', '</a>', '</td>', '</tr>', '</tbody>', '</table>', '</td>', '<td>', '<a>', '<b>', '(.*?)', '</b>', '</a>', '<br/>', '<table>', '<tbody>', '<tr>', '<td>', '<table>', '<tbody>', '<tr>', '<td>', '<b>', 'List Price:', '</b>', '</td>', '<td>', '<s>', '(.*?)', '</s>', '</td>', '</tr>', '<tr>', '<td>', '<b>', 'Price:', '</b>', '</td>', '<td>', '<span>', '<b>', '(.*?)', '</b>', '</span>', '</td>', '</tr>', '<tr>', '<td>', '<b>', 'You Save:', '</b>', '</td>', '<td>', '<span>', '(.*?)', '</span>', '</td>', '</tr>', '</tbody>', '</table>', '</td>', '<td>', '<span>', '(.*?)', '<br/>', '<a>', '<span>', '<b>', 'Click here to purchase.', '</b>', '</span>', '</a>', '</span>', '<br/>', '(</td>)?', '(<table>', '<tbody>', '<tr>', '<td>', '<a>', '<img/>', '</a>', '</td>', '</tr>', '</tbody>', '</table>', '</td>)?', '</tr>', '</tbody>', '</table>', '</td>', '</tr>', '<tr>', '<td>', '<img/>', '</td>', '</tr>', '<tr>', '<td>', '<table>', '<tbody>', '<tr>', '<td>', '<a>', '<img/>', '</a>', '</td>', '</tr>', '<tr>', '<td>', '<a>', 'More Info...', '</a>', '</td>', '</tr>', '</tbody>', '</table>', '</td>', '<td>', '<a>', '<b>', '(.*?)', '</b>', '</a>', '<br/>', '<table>', '<tbody>', '<tr>', '<td>', '<table>', '<tbody>', '<tr>', '<td>', '<b>', 'List Price:', '</b>', '</td>', '<td>', '<s>', '(.*?)', '</s>', '</td>', '</tr>', '<tr>', '<td>', '<b>', 'Price:', '</b>', '</td>', '<td>', '<span>', '<b>', '(.*?)', '</b>', '</span>', '</td>', '</tr>', '<tr>', '<td>', '<b>', 'You Save:', '</b>', '</td>', '<td>', '<span>', '(.*?)', '</span>', '</td>', '</tr>', '</tbody>', '</table>', '</td>', '<td>', '<span>', '(.*?)', '<br/>', '<a>', '<span>', '<b>', 'Click here to purchase.', '</b>', '</span>', '</a>', '</span>', '<br/>', '</td>', '</tr>', '</tbody>', '</table>', '</td>', '</tr>', '<tr>', '<td>', '<img/>', '</td>', '</tr>', '<tr>', '<td>', '<table>', '<tbody>', '<tr>', '<td>', '<a>', '<img/>', '</a>', '</td>', '</tr>', '<tr>', '<td>', '<a>', 'More Info...', '</a>', '</td>', '</tr>', '</tbody>', '</table>', '</td>', '<td>', '<a>', '<b>', '(.*?)', '</b>', '</a>', '<br/>', '<table>', '<tbody>', '<tr>', '<td>', '<table>', '<tbody>', '<tr>', '<td>', '<b>', 'List Price:', '</b>', '</td>', '<td>', '<s>', '(.*?)', '</s>', '</td>', '</tr>', '<tr>', '<td>', '<b>', 'Price:', '</b>', '</td>', '<td>', '<span>', '<b>', '(.*?)', '</b>', '</span>', '</td>', '</tr>', '<tr>', '<td>', '<b>', 'You Save:', '</b>', '</td>', '<td>', '<span>', '(.*?)', '</span>', '</td>', '</tr>', '</tbody>', '</table>', '</td>', '<td>', '<span>', '(.*?)', '<br/>', '<a>', '<span>', '<b>', 'Click here to purchase.', '</b>', '</span>', '</a>', '</span>', '<br/>', '(<table>', '<tbody>', '<tr>', '<td>', '<a>', '<img/>', '</a>', '</td>', '</tr>', '</tbody>', '</table>', '</td>)?', '(</td>)?', '</tr>', '</tbody>', '</table>', '</td>', '</tr>', '<tr>', '<td>', '<img/>', '</td>', '</tr>', '<tr>', '<td>', '<table>', '<tbody>', '<tr>', '<td>', '<a>', '<img/>', '</a>', '</td>', '</tr>', '<tr>', '<td>', '<a>', 'More Info...', '</a>', '</td>', '</tr>', '</tbody>', '</table>', '</td>', '<td>', '<a>', '<b>', '(.*?)', '</b>', '</a>', '<br/>', '<table>', '<tbody>', '<tr>', '<td>', '<table>', '<tbody>', '<tr>', '<td>', '<b>', 'List Price:', '</b>', '</td>', '<td>', '<s>', '(.*?)', '</s>', '</td>', '</tr>', '<tr>', '<td>', '<b>', 'Price:', '</b>', '</td>', '<td>', '<span>', '<b>', '(.*?)', '</b>', '</span>', '</td>', '</tr>', '<tr>', '<td>', '<b>', 'You Save:', '</b>', '</td>', '<td>', '<span>', '(.*?)', '</span>', '</td>', '</tr>', '</tbody>', '</table>', '</td>', '<td>', '<span>', '(.*?)', '<br/>', '<a>', '<span>', '<b>', 'Click here to purchase.', '</b>', '</span>', '</a>', '</span>', '<br/>', '</td>', '</tr>', '</tbody>', '</table>', '</td>', '</tr>', '<tr>', '<td>', '<img/>', '</td>', '</tr>']
+    reggexx = ""
+    for regex_part in reggexxx:
+        reggexx += regex_part
+    reggexx = replace_tags(reggexx)
+    sample_content = open(base_content_path + file2, 'r', encoding="latin-1").read()
+    wrapper_content = open(base_content_path + file1, 'r', encoding="latin-1").read()
+    wrapper_content, sample_content = clean_up(wrapper_content, sample_content)
+    print(re.search(reggexx, wrapper_content))
