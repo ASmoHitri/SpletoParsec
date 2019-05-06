@@ -362,12 +362,12 @@ def html_to_list(html):
 
 def clean_up(html1, html2):
     #remove the not necessary stuff
-    cleaner = Cleaner(page_structure=False, safe_attrs=frozenset([]), )
+    cleaner = Cleaner(page_structure=False, style=True, safe_attrs=frozenset([]), )
     html1 = cleaner.clean_html(html1)
     html2 = cleaner.clean_html(html2)
     #transform to bs
-    html1_bs = bs4.BeautifulSoup(html1)
-    html2_bs = bs4.BeautifulSoup(html2)
+    html1_bs = bs4.BeautifulSoup(html1, "lxml")
+    html2_bs = bs4.BeautifulSoup(html2, "lxml")
     html1 = html1_bs.prettify()
     html2 = html2_bs.prettify()
     return html1, html2
@@ -387,4 +387,10 @@ def get_wrapper(file_name1, file_name2, encoding="utf-8"):
 
 
 if __name__ == "__main__":
-    print(get_wrapper("../tests/test_html1.html", "../tests/test_html1.html"))
+    # file1 = "../tests/test_html1.html"
+    # file2 = "../tests/test_html1.html"
+    # file1 = "../input/rtvslo.si/Audi.html"
+    # file2 = "../input/rtvslo.si/Volvo.html"
+    file1 = "../input/overstock.com/jewelry01.html"
+    file2 = "../input/overstock.com/jewelry02.html"
+    print(get_wrapper(file1, file2, encoding="Latin-1"))
