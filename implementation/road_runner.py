@@ -175,6 +175,12 @@ def update_iterator_regex(regex, iterator_regex):
             elif tag_state is False:
                 num_of_closing_tags += 1
     start_idx = idx
+    idx_diff = end_idx - start_idx + 1
+    while start_idx - idx_diff >= 0:
+        if regex[start_idx - idx_diff: start_idx] == iterator_regex:
+            start_idx = start_idx - idx_diff
+        else:
+            break
     before_regex = regex[0:start_idx]
     if end_idx == len(regex) - 1:
         after_regex = []
@@ -182,6 +188,7 @@ def update_iterator_regex(regex, iterator_regex):
         after_regex = regex[end_idx + 1:]
     iterator_regex[0] = "(" + iterator_regex[0]
     iterator_regex[-1] = iterator_regex[-1] + ")*"
+
     return before_regex + iterator_regex + after_regex
 
 
@@ -195,7 +202,7 @@ def get_next_tag(html_list, index):
                 return None
             if is_tag(html_list[index]):
                 return (index, get_tag_name(html_list[index]))
-    #is both
+    # is both
     elif is_tag(html_list[index], which_tag='both'):
         while True:
             index += 1
@@ -422,4 +429,5 @@ if __name__ == "__main__":
     file1 = "../tests/html_example1.html"
     file2 = "../tests/html_example2.html"
 
+    print()
     print(get_wrapper(file1, file2))
