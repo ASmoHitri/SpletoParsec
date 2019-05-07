@@ -1,7 +1,6 @@
 import re
 import bs4
 from lxml.html.clean import Cleaner
-base_content_path = "../input/"
 
 
 def get_next_item(html):
@@ -370,30 +369,15 @@ def get_wrapper(wrapper_content, sample_content):
     for regex_part in regex_list:
         regex += regex_part + "\s*"
     regex = replace_tags(regex)
-    return regex, sample_content
+    return regex
 
 
 if __name__ == "__main__":
-    # file1 = "../tests/test_html1.html"
-    # file2 = "../tests/test_html2.html"
-    #file1 = "../input/rtvslo.si/Audi.html"
-    #file2 = "../input/rtvslo.si/Volvo.html"
-    file1 = "../input/ideo.si/ideo1.html"
-    file2 = "../input/ideo.si/ideo2.html"
-    # file1 = "../tests/html_example1.html"
-    # file2 = "../tests/html_example2.html"
-    # file1 = "../input/overstock.com/jewelry01.html"
-    # file2 = "../input/overstock.com/jewelry02.html"
+    file1 = "../input/rtvslo.si/Audi.html"
+    file2 = "../input/rtvslo.si/Volvo.html"
 
+    wrapper_content = open(file1, 'r', encoding="utf-8").read()
+    sample_content = open(file2, 'r', encoding="utf-8").read()
 
-    output_regex, sample_content = get_wrapper(file1, file2, encoding="windows-1250")
-    #output_regex, sample_content = get_wrapper(file1, file2, encoding="Latin-1")
-    #output_regex, sample_content = get_wrapper("../input/ideo.si/stroji za pometanje _ ideo.si.html", "../input/ideo.si/Termostatski podometni kompleti _ ideo.si.html", encoding="windows-1250")
-    #output_regex = replace_tags(output_regex)
-    print()
+    output_regex = get_wrapper(wrapper_content, sample_content)
     print(output_regex)
-
-    with open("../outputs/road_runner/ideo", "w", encoding="utf-8") as file:
-         file.write(output_regex)
-    print(output_regex)
-
