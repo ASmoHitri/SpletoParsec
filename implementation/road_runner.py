@@ -80,6 +80,8 @@ def get_previous_tag_name(items_list, curr_idx):
 def get_upper_square(items_list, curr_idx):
     num_of_closing_tags = 1
     idx = curr_idx - 1
+    if not is_tag(items_list[idx], which_tag='end'):
+        return []
     while num_of_closing_tags > 0:
         idx -= 1
         if idx < 0:
@@ -252,6 +254,7 @@ def compare_tree(wrapper_list, sample_list):
 
                 # check if iterator
                 if is_tag(next_item_w, which_tag="start") and curr_wrapper_tag_name == prev_tag_name_wrapper:
+                    # wrapper iterator?
                     square_candidate, new_idx = get_iterator_square_candidate(
                         prev_tag_name_wrapper, wrapper_list, idxs[0])
                     upper_square = get_upper_square(wrapper_list, idxs[0])
@@ -263,6 +266,7 @@ def compare_tree(wrapper_list, sample_list):
                         continue
 
                 if is_tag(next_item_s, which_tag="start") and curr_sample_tag_name == prev_tag_name_sample:
+                    # sample iterator?
                     square_candidate, new_idx = get_iterator_square_candidate(
                         prev_tag_name_sample, sample_list, idxs[1])
                     upper_square = get_upper_square(sample_list, idxs[1])
