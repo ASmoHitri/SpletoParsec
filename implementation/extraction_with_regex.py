@@ -70,7 +70,7 @@ def extract_from_rtvslo(file_name: str):
 
 
 def extract_from_ideo(file_name: str):
-    html_content = open(base_content_path + file_name, 'r').read()
+    html_content = open(base_content_path + file_name, 'r', encoding="windows-1250").read()
 
     title = """<div class="naslov">\s*<div style=.*>\s*<a href=.*>(.*)</a>"""
     lead = """<div class=\"opis mobilno-skrij\">*\s*<div style=.*>\s*(.*)\s*</div>"""
