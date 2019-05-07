@@ -361,9 +361,7 @@ def replace_tags(input_string: str):
     return input_string
 
 
-def get_wrapper(file_name1, file_name2, encoding="utf-8"):
-    wrapper_content = open(base_content_path + file_name1, 'r', encoding=encoding).read()
-    sample_content = open(base_content_path + file_name2, 'r', encoding=encoding).read()
+def get_wrapper(wrapper_content, sample_content):
     wrapper_content, sample_content = clean_up(wrapper_content, sample_content)
     wrapper = html_to_list(wrapper_content)
     sample = html_to_list(sample_content)
@@ -371,6 +369,7 @@ def get_wrapper(file_name1, file_name2, encoding="utf-8"):
     regex = ""
     for regex_part in regex_list:
         regex += regex_part + "\s*"
+    regex = replace_tags(regex)
     return regex, sample_content
 
 
