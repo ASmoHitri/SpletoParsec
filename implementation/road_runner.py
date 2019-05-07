@@ -143,8 +143,10 @@ def is_iterator(wrapper_list, sample_list):
 def update_iterator_regex(regex, iterator_regex):
     idx = len(regex) - 1
     iterator_tag_name = get_tag_name(iterator_regex[0])
-    curr_tag_name = get_tag_name(regex[idx])
+    curr_tag_name = get_tag_name(regex[idx])        # last tag in regex
     if curr_tag_name != iterator_tag_name:
+        # this is not the right part of regex yet,
+        # skip it
         num_of_closing_tags = 1
         while num_of_closing_tags > 0:
             idx -= 1
@@ -183,7 +185,7 @@ def update_iterator_regex(regex, iterator_regex):
     else:
         after_regex = regex[end_idx + 1:]
     iterator_regex[0] = "(" + iterator_regex[0]
-    iterator_regex[-1] = iterator_regex[-1] + ")*"
+    iterator_regex[-1] = iterator_regex[-1] + "\s*)*"
 
     return before_regex + iterator_regex + after_regex
 
@@ -444,15 +446,16 @@ if __name__ == "__main__":
     # file2 = "../tests/test_html2.html"
     # file1 = "../input/rtvslo.si/Audi.html"
     # file2 = "../input/rtvslo.si/Volvo.html"
-    # file1 = "../input/overstock.com/jewelry01.html"
-    # file2 = "../input/overstock.com/jewelry02.html"
-    file1 = "../tests/html_example1.html"
-    file2 = "../tests/html_example2.html"
+    file1 = "../input/overstock.com/jewelry01.html"
+    file2 = "../input/overstock.com/jewelry02.html"
+    # file1 = "../tests/html_example1.html"
+    # file2 = "../tests/html_example2.html"
 
-    output_regex, sample_content = get_wrapper(file1, file2)
+    # output_regex, sample_content = get_wrapper(file1, file2)
+    output_regex, sample_content = get_wrapper(file1, file2, encoding="Latin-1")
     output_regex = replace_tags(output_regex)
     print()
     print(output_regex)
 
-    print(sample_content)
-    print(re.search(output_regex, sample_content))
+    # print(sample_content)
+    # print(re.search(output_regex, sample_content).groups())

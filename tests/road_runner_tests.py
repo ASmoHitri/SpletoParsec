@@ -69,15 +69,16 @@ class TestRoadRunnerMethods(unittest.TestCase):
         regex_list = ["<div>", "(.*?)", "(<img>", "r1", "r2", "</img>)?",
                       "(<li>", "dfjsdf", "</li>)?"]
         iterator_regex_list = ["<img>", "(.*?)", "</img>"]
-        self.assertEqual(['<div>', '(.*?)', '(<img>', '(.*?)', '</img>)*', '(<li>', 'dfjsdf', '</li>)?'],
+        self.assertEqual(['<div>', '(.*?)', '(<img>', '(.*?)', '</img>\s*)*', '(<li>', 'dfjsdf', '</li>)?'],
                          road_runner.update_iterator_regex(regex_list, iterator_regex_list))
 
         regex_list = ["<div>", "(.*?)", "(<img>", "r1", "r2", "</img>)*",
                       "(<li>", "dfjsdf", "</li>)?"]
+        iterator_regex_list = ["<img>", "(.*?)", "</img>"]
         self.assertEqual(["<div>", "(.*?)", "(<img>", "r1", "r2", "</img>)*", "(<li>", "dfjsdf", "</li>)?"],
                          road_runner.update_iterator_regex(regex_list, iterator_regex_list))
 
         regex_list = ["<div>", "(.*?)", "<img>", "(.*?)", "</img>", "<img>", "(.*?)", "</img>",
                       "(<li>", "dfjsdf", "</li>)?"]
-        self.assertEqual(["<div>", "(.*?)", "(<img>", "(.*?)", "</img>)*", "(<li>", "dfjsdf", "</li>)?"],
+        self.assertEqual(["<div>", "(.*?)", "(<img>", "(.*?)", "</img>\s*)*", "(<li>", "dfjsdf", "</li>)?"],
                          road_runner.update_iterator_regex(regex_list, iterator_regex_list))
