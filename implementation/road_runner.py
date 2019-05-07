@@ -191,103 +191,27 @@ def update_iterator_regex(regex, iterator_regex):
 
 
 def get_next_tag(html_list, index):
-    is_end = is_tag(html_list[index], which_tag='end')
-    # is end tag, pogledamo prvega, ki se razlikuje
-    if is_end:
-        while True:
-            index += 1
-            if index >= len(html_list):
-                return (index-1, None)
-            if is_tag(html_list[index]):
-                return (index - 1, get_tag_name(html_list[index]))
-    # is both
-    elif is_tag(html_list[index], which_tag='both'):
-        while True:
-            index += 1
-            if index >= len(html_list):
-                return (index-1, None)
-            if is_tag(html_list[index]):
-                return (index, get_tag_name(html_list[index]))
-    # is a start tag
-    else:
+    if is_tag(html_list[index], which_tag='start'):
+        # find tags end tag
         start_tags = 1
-        end_tags = 0
+        while start_tags > 0:
+            index += 1
+            if index >= len(html_list):
+                return index - 1, None
+            is_start = is_tag(html_list[index], which_tag='start')
+            if is_start:
+                start_tags += 1
+            elif is_start is False and not is_tag(html_list[index], which_tag='both'):
+                start_tags -= 1
+
         while True:
             index += 1
             if index >= len(html_list):
-                return (index-1,None)
+                return index-1, None
             if is_tag(html_list[index]):
-                if start_tags == end_tags:
-                    return (index, get_tag_name(html_list[index]))
-                elif is_tag(html_list[index], which_tag='end'):
-                    end_tags += 1
-                else:
-                    start_tags += 1
+                return index, get_tag_name(html_list[index])
 
-# def compare_tree(wrapper_html, sample_html):
-#     """
-#     :param wrapper_html: Wrapper HTML
-#     :param sample_html: Sample HTML
-#     """
-#     wrapper_list = []
-#     sample_list = []
-#     regex_list = []
-#
-#     wrapper_idx = 0
-#     sample_idx = 0
-#
-#     while wrapper_html and sample_html:
-#         next_item_w, wrapper_html = get_next_item(wrapper_html)
-#         next_item_s, sample_html = get_next_item(sample_html)
-#
-#         # add new items to list
-#         wrapper_list.append(next_item_w)
-#         sample_list.append(next_item_s)
-#
-#         # check whether the same or mismatch
-#         if next_item_w == next_item_s:
-#             regex_list.append(next_item_w)
-#             return regex_list
-#         if is_tag(next_item_w):
-#             if is_tag(next_item_s):
-#                 # tag mismatch
-#                 prev_tag_name = get_previous_tag_name(wrapper_list)
-#                 curr_sample_tag_name = get_tag_name(next_item_s)
-#                 curr_wrapper_tag_name = get_tag_name(next_item_w)
-#
-#                 iterator_candidate_html = None
-#                 iterator_candidate_list = None
-#                 if curr_wrapper_tag_name == prev_tag_name:
-#                     iterator_candidate_html = wrapper_html
-#                     iterator_candidate_list = wrapper_list
-#                 elif curr_sample_tag_name == prev_tag_name:
-#                     iterator_candidate_html = sample_html
-#                     iterator_candidate_list = sample_list
-#
-#                 if iterator_candidate_html:
-#                     square_candidate = get_iterator_square_candidate(prev_tag_name, iterator_candidate_html)
-#                     upper_square = get_upper_square(iterator_candidate_list)
-#                     # check if iterator
-#
-#                 # not iterator --> optional -- cross matching
-#                 # TODO ne bo okkk, rabis indexe!!
-#                 wrapper_next = get_next_different_tag(curr_wrapper_tag_name, wrapper_html)
-#                 sample_next = get_next_different_tag(curr_sample_tag_name, sample_html)
-#
-#             else:
-#                 # string-tag mismatch --> sample string
-#                 regex_list.append("(.*?)")
-#                 sample_idx += 1
-#         elif is_tag(next_item_s):
-#             # string-tag mismatch --> wrapper string
-#             regex_list.append("(.*?)")
-#             wrapper_idx += 1
-#         else:
-#             # string mismatch
-#             regex_list.append("(.*?)")
-#             wrapper_idx += 1
-#             sample_idx += 1
-#     return regex_list
+    return index, get_tag_name(html_list[index])
 
 
 def compare_tree(wrapper_list, sample_list):
@@ -349,53 +273,42 @@ def compare_tree(wrapper_list, sample_list):
                 # not iterator --> optional -- cross matching
                 new_wrapper_idx, wrapper_next_tag = get_next_tag(wrapper_list, idxs[0])
                 new_sample_idx, sample_next_tag = get_next_tag(sample_list, idxs[1])
-                #wrapper has no next tag
-                if not wrapper_next_tag:
-                    # sample is optional
-                    regex_to_add = sample_list[idxs[1]:new_sample_idx]
-                    regex_to_add[0] = "(" + regex_to_add[0]
-                    regex_to_add[-1] = regex_to_add[-1] + ")?"
-                    regex_list = regex_list + regex_to_add
-                    idxs[1] = new_sample_idx
-                #sample has no next tag
-                if not sample_next_tag:
-                    # wrapper is optional
-                    regex_to_add = wrapper_list[idxs[0]:new_wrapper_idx]
-                    regex_to_add[0] = "(" + regex_to_add[0]
-                    regex_to_add[-1] = regex_to_add[-1] + ")?"
-                    regex_list = regex_list + regex_to_add
-                    idxs[0] = new_wrapper_idx
-                #wrapper and sample have no next tag
+
+                # wrapper and sample have no next tag
                 if not sample_next_tag and not wrapper_next_tag:
                     print("OBA STA None!!!!!!")
-                if wrapper_next_tag == curr_sample_tag_name:
+                if not sample_next_tag or wrapper_next_tag == curr_sample_tag_name:
                     # wrapper is optional
                     regex_to_add = wrapper_list[idxs[0]:new_wrapper_idx]
-                    regex_to_add[0] = "(" + regex_to_add[0]
-                    regex_to_add[-1] = regex_to_add[-1] + ")?"
-                    regex_list = regex_list + regex_to_add
+                    if regex_to_add:
+                        regex_to_add[0] = "(" + regex_to_add[0]
+                        regex_to_add[-1] = regex_to_add[-1] + ")?"
+                        regex_list = regex_list + regex_to_add
                     idxs[0] = new_wrapper_idx
-                if sample_next_tag == curr_wrapper_tag_name:
+                if not wrapper_next_tag or sample_next_tag == curr_wrapper_tag_name:
                     # sample is optional
                     regex_to_add = sample_list[idxs[1]:new_sample_idx]
-                    regex_to_add[0] = "(" + regex_to_add[0]
-                    regex_to_add[-1] = regex_to_add[-1] + ")?"
-                    regex_list = regex_list + regex_to_add
+                    if regex_to_add:
+                        regex_to_add[0] = "(" + regex_to_add[0]
+                        regex_to_add[-1] = regex_to_add[-1] + ")?"
+                        regex_list = regex_list + regex_to_add
                     idxs[1] = new_sample_idx
 
                 if sample_next_tag != curr_wrapper_tag_name and wrapper_next_tag != curr_sample_tag_name:
                     # wrapper is optional
                     regex_to_add = wrapper_list[idxs[0]:new_wrapper_idx]
-                    regex_to_add[0] = "(" + regex_to_add[0]
-                    regex_to_add[-1] = regex_to_add[-1] + ")?"
-                    regex_list = regex_list + regex_to_add
+                    if regex_to_add:
+                        regex_to_add[0] = "(" + regex_to_add[0]
+                        regex_to_add[-1] = regex_to_add[-1] + ")?"
+                        regex_list = regex_list + regex_to_add
                     idxs[0] = new_wrapper_idx
 
                     # sample is optional
                     regex_to_add = sample_list[idxs[1]:new_sample_idx]
-                    regex_to_add[0] = "(" + regex_to_add[0]
-                    regex_to_add[-1] = regex_to_add[-1] + ")?"
-                    regex_list = regex_list + regex_to_add
+                    if regex_to_add:
+                        regex_to_add[0] = "(" + regex_to_add[0]
+                        regex_to_add[-1] = regex_to_add[-1] + ")?"
+                        regex_list = regex_list + regex_to_add
                     idxs[1] = new_sample_idx
             else:
                 # string-tag mismatch --> sample string
