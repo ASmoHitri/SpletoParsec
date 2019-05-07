@@ -16,7 +16,7 @@ def get_next_item(html):
     else:
         while html[idx] != "<":
             idx += 1
-        return html[0:idx].strip(), html[idx:]
+        return re.escape(html[0:idx].strip()), html[idx:]
 
 
 def is_tag(input_str: str, which_tag='any'):
@@ -80,13 +80,14 @@ def get_previous_tag_name(items_list, curr_idx):
 def get_upper_square(items_list, curr_idx):
     num_of_closing_tags = 1
     idx = curr_idx - 1
-    tag_name = get_tag_name(items_list[curr_idx])
     while num_of_closing_tags > 0:
         idx -= 1
-        if items_list[idx] == "<{}>".format(tag_name):
-            num_of_closing_tags -= 1
-        elif items_list[idx] == "</{}>".format(tag_name):
+        if idx < 0:
+            return []
+        if is_tag(items_list[idx], which_tag='end'):
             num_of_closing_tags += 1
+        elif is_tag(items_list[idx], which_tag='start'):
+            num_of_closing_tags -= 1
     return items_list[idx:curr_idx]
 
 
@@ -110,6 +111,8 @@ def get_tag_name(input_str: str, get_all=False):
 
 
 def is_iterator(wrapper_list, sample_list):
+    if not wrapper_list or not sample_list:
+        return False, None
     regex_list = []
     wrapper_idx = 0
     sample_idx = 0
@@ -376,18 +379,20 @@ def get_wrapper(file_name1, file_name2, encoding="utf-8"):
 if __name__ == "__main__":
     # file1 = "../tests/test_html1.html"
     # file2 = "../tests/test_html2.html"
-    # file1 = "../input/rtvslo.si/Audi.html"
-    # file2 = "../input/rtvslo.si/Volvo.html"
-    file1 = "../input/overstock.com/jewelry01.html"
-    file2 = "../input/overstock.com/jewelry02.html"
+    file1 = "../input/rtvslo.si/Audi.html"
+    file2 = "../input/rtvslo.si/Volvo.html"
+    # file1 = "../input/overstock.com/jewelry01.html"
+    # file2 = "../input/overstock.com/jewelry02.html"
     # file1 = "../tests/html_example1.html"
     # file2 = "../tests/html_example2.html"
 
-    # output_regex, sample_content = get_wrapper(file1, file2)
-    output_regex, sample_content = get_wrapper(file1, file2, encoding="Latin-1")
+    output_regex, sample_content = get_wrapper(file1, file2)
+    # output_regex, sample_content = get_wrapper(file1, file2, encoding="Latin-1")
     output_regex = replace_tags(output_regex)
     print()
     print(output_regex)
 
-    # print(sample_content)
-    # print(re.search(output_regex, sample_content).groups())
+    # with open("../tests/rtv1.html", "w", encoding="utf-8") as file:
+    #     file.write(sample_content)
+    print(sample_content)
+    print(re.search(output_regex, sample_content))
