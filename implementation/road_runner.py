@@ -219,7 +219,7 @@ def get_next_tag(html_list, index):
     return index, get_tag_name(html_list[index])
 
 
-def compare_tree(wrapper_list, sample_list):
+def compare_html(wrapper_list, sample_list):
     """
     :param wrapper_list: Wrapper HTML list
     :param sample_list: Sample HTML list
@@ -234,9 +234,6 @@ def compare_tree(wrapper_list, sample_list):
         # print("Super regex, ", regex_list)
         next_item_w = wrapper_list[idxs[0]]
         next_item_s = sample_list[idxs[1]]
-
-        # print("w",next_item_w)
-        # print("s", next_item_s)
 
         # check whether the same or mismatch
         if next_item_w == next_item_s:
@@ -368,12 +365,9 @@ def get_wrapper(file_name1, file_name2, encoding="utf-8"):
     wrapper_content = open(base_content_path + file_name1, 'r', encoding=encoding).read()
     sample_content = open(base_content_path + file_name2, 'r', encoding=encoding).read()
     wrapper_content, sample_content = clean_up(wrapper_content, sample_content)
-    # print(wrapper_content)
-    # print("-------------------------------------------------------")
-    # print(sample_content)
     wrapper = html_to_list(wrapper_content)
     sample = html_to_list(sample_content)
-    regex_list = compare_tree(wrapper, sample)
+    regex_list = compare_html(wrapper, sample)
     regex = ""
     for regex_part in regex_list:
         regex += regex_part + "\s*"

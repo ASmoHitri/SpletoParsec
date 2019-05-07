@@ -1,0 +1,50 @@
+[
+  {
+    "Title": "KARCHER S650 1.766-300.0 pometač",
+    "Price": "106,90€",
+    "Description": "KARCHER S 650 17663000 pometač, delovna širina s stransko krtačo: 650 mm, maks. površinska zmogljivost: 1800 m²/h, posoda za smeti: 16 l, priporočamo od površine: 40 m², število stranskih krtač: 2",
+    "Stock": "NA ZALOGI"
+  },
+  {
+    "Title": "KARCHER S 650 2v1 1.766-307.0 pometač",
+    "Price": "122,90€",
+    "Description": "KARCHER S650 2v1 17663070 pometač, delovna širina s stransko krtačo: 650 mm, maks. površinska zmogljivost: 1800 m²/h, priporočamo od površine: 40 m²",
+    "Stock": "NA ZALOGI"
+  },
+  {
+    "Title": "KARCHER S750 1.766-910.0 pometač",
+    "Price": "248,90€",
+    "Description": "KARCHER S 750 17669100 pometač, delovna širina s stransko krtačo: 700 mm, maks. površinska zmogljivost: 2500 m²/h, posoda za smeti: 32 l, priporočamo od površine: 60 m², število stranskih krtač: 1",
+    "Stock": "NA ZALOGI"
+  },
+  {
+    "Title": "REM POWER SWM 2800 450280001 pometač",
+    "Price": "249,90€",
+    "Description": "REM POWER SWM2800 450280001 stroj za pometanje , kapaciteta čiščenja (m²/h): 2800, velikost glavne krtače (mm): 470, število krtač: 4, širina pometanja, maks (mm): 800",
+    "Stock": "NA ZALOGI"
+  },
+  {
+    "Title": "TEXAS RA JL550S MS550 ročni pometač",
+    "Price": "115,32€",
+    "Description": "TEXAS RA JL550S MS550 ročni pometač, s kolektorjem in delovno širino 55 cm. Pometač je zelo malo in je enostaven za uporabo. Opremljen z nastavljivim vodilom,",
+    "Stock": "Na zalogi dob."
+  },
+  {
+    "Title": "KARCHER S550 1.766-200.0 pometač",
+    "Price": "94,90€",
+    "Description": "KARCHER S 550 17662000 pometač, delovna širina s stransko krtačo: 550 mm, maks. površinska zmogljivost: 1600 m²/h, posoda za smeti: 16 l, priporočamo od površine: 30 m², število stranskih krtač: 1",
+    "Stock": "predvidoma 5-7 dni"
+  },
+  {
+    "Title": "RAMDA JL920F ročni pometač",
+    "Price": "348,78€",
+    "Description": "RAMDA JL920F ročni pometač. Ročni pometač JL920F z zbiralcem ima delovno širino 92 cm. Pometač je enostaven za uporabo in je opremljen z nastavljivim vodilom, ki omogoča prijetno delo.",
+    "Stock": "Na zalogi dob."
+  },
+  {
+    "Title": "RAMDA JL750S ročni pometač",
+    "Price": "155,19€",
+    "Description": "RAMDA JL750S ročni pometač. Ročni pometač JL750 z zbiralcem ima delovno širino 75 cm. Pometač je enostaven za uporabo in je opremljen z nastavljivim vodilom, ki omogoča prijetno delo.",
+    "Stock": "Na zalogi dob."
+  }
+]

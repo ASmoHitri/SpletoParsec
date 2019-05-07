@@ -2,12 +2,9 @@ import re
 import json
 import logging
 
-base_content_path = "../input/"
 
-
-def extract_from_overstock(file_name: str):
+def extract_from_overstock(html_content):
     data_records = []
-    html_content = open(base_content_path + file_name, 'r', encoding="Latin_1").read()
     regex_dict = {
         "Title": "<td valign=\"top\">\s+<a\s+href=\"\S*\"><b>(.*)</b>",
         "ListPrice": "List Price:</b>\s*</td>\s*<td align=\"left\" nowrap=\"nowrap\">\s*<s>(.*)</s>",
@@ -31,7 +28,7 @@ def extract_from_overstock(file_name: str):
                 "Price": prices_match[i].group(1),
                 "Saving": savings_match[i].group(1),
                 "SavingPercent": saving_percents_match[i].group(1),
-                "Content": contents_match[i].group(1)
+                "Content": contents_match[i].group(1).strip().replace("\n", " ")
             })
     else:
         logging.error("Numbers of matches found in HTML content don't match.")
@@ -42,8 +39,7 @@ def extract_from_overstock(file_name: str):
     return output
 
 
-def extract_from_rtvslo(file_name: str):
-    html_content = open(base_content_path + file_name, 'r', encoding="utf-8").read()
+def extract_from_rtvslo(html_content):
     regex_dict = {
         "Author": "<div class=\"author-name\">(.*)</div>",
         "PublishedTime": "<div class=\"publish-meta\">\s+(.*)<br>",
@@ -69,37 +65,43 @@ def extract_from_rtvslo(file_name: str):
     return json.dumps(dataItem, indent=2, ensure_ascii=False)
 
 
-def extract_from_ideo(file_name: str):
-    html_content = open(base_content_path + file_name, 'r', encoding="windows-1250").read()
-
+def extract_from_ideo(html_content):
     title = """<div class="naslov">\s*<div style=.*>\s*<a href=.*>(.*)</a>"""
-    lead = """<div class=\"opis mobilno-skrij\">*\s*<div style=.*>\s*(.*)\s*</div>"""
+    description= """<div class=\"opis mobilno-skrij\">*\s*<div style=.*>\s*(.*)\s*</div>"""
     price = """<div class="mobilno-skrij" style=.*>Spletna cena:</div>\s*<div class="cena" style=.*>(.*)<small>"""
     stock = "<span class=\"vprasaj_dobava\">\s*<a rel=.*>(.*)</a>"
 
     titles = re.findall(title, html_content)
-    leads = re.findall(lead, html_content)
+    descriptions = re.findall(description, html_content)
     prices = re.findall(price, html_content)
     stocks = re.findall(stock, html_content)
 
     data = []
     for i in range(len(titles)):
         data.append({"Title": titles[i], "Price": prices[i] +
-                     "€", "Lead": re.sub("([[\\t]+</div>]?)","",leads[i]), "Stock": stocks[i]})
+                     "€", "Description": re.sub("([[\\t]+</div>]?)","",descriptions[i].strip()), "Stock": stocks[i]})
 
     print(json.dumps(data, indent=2, ensure_ascii=False))
     return json.dumps(data, indent=2, ensure_ascii=False)
 
 
 if __name__ == "__main__":
-    extract_from_overstock("overstock.com/jewelry01.html")
+    base_content_path = "../input/"
+    #Primer OVERSTOCK
+    overstock_html1 = open("../input/overstock.com/jewelry01.html", 'r', encoding="latin-1").read()
+    extract_from_overstock(overstock_html1)
+    overstock_html2 = open("../input/overstock.com/jewelry02.html", 'r', encoding="latin-1").read()
+    extract_from_overstock(overstock_html2)
 
-    extract_from_rtvslo(
-        "rtvslo.si/Audi.html")
+    #Primer RTV SLO
+    rtv_audi_html = open("../input/rtvslo.si/Audi.html", 'r', encoding="utf-8").read()
+    extract_from_rtvslo(rtv_audi_html)
+    rtv_volvo_html = open("../input/rtvslo.si/Volvo.html", 'r', encoding="utf-8").read()
+    extract_from_rtvslo(rtv_volvo_html)
 
-    extract_from_rtvslo(
-        "rtvslo.si/Volvo.html")
+    #Primer IDEO
+    ideo_pometaci_html = open("../input/ideo.si/stroji za pometanje _ ideo.si.html", 'r', encoding="windows-1250").read()
+    extract_from_ideo(ideo_pometaci_html)
 
-    extract_from_ideo("ideo.si/stroji za pometanje _ ideo.si.html")
-
-    extract_from_ideo("ideo.si/Termostatski podometni kompleti _ ideo.si.html")
+    ideo_podmetni_kompleti_html = open("../input/ideo.si/Termostatski podometni kompleti _ ideo.si.html", 'r',encoding="windows-1250").read()
+    extract_from_ideo(ideo_podmetni_kompleti_html)
