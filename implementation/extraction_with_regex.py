@@ -70,10 +70,10 @@ def extract_from_rtvslo(file_name: str):
 
 
 def extract_from_ideo(file_name: str):
-    html_content = open(base_content_path + file_name, 'r').read()
+    html_content = open(base_content_path + file_name, 'r', encoding="windows-1250").read()
 
     title = """<div class="naslov">\s*<div style=.*>\s*<a href=.*>(.*)</a>"""
-    lead = """<div class=\"opis mobilno-skrij\">\s*<div style=.*>\s*(.*)\s*</div>"""
+    lead = """<div class=\"opis mobilno-skrij\">*\s*<div style=.*>\s*(.*)\s*</div>"""
     price = """<div class="mobilno-skrij" style=.*>Spletna cena:</div>\s*<div class="cena" style=.*>(.*)<small>"""
     stock = "<span class=\"vprasaj_dobava\">\s*<a rel=.*>(.*)</a>"
 
@@ -85,7 +85,7 @@ def extract_from_ideo(file_name: str):
     data = []
     for i in range(len(titles)):
         data.append({"Title": titles[i], "Price": prices[i] +
-                     "€", "Lead": leads[i], "Stock": stocks[i]})
+                     "€", "Lead": re.sub("([[\\t]+</div>]?)","",leads[i]), "Stock": stocks[i]})
 
     print(json.dumps(data, indent=2, ensure_ascii=False))
     return json.dumps(data, indent=2, ensure_ascii=False)

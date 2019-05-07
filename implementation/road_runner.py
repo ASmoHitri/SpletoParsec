@@ -197,15 +197,15 @@ def get_next_tag(html_list, index):
         while True:
             index += 1
             if index >= len(html_list):
-                return None
+                return (index-1, None)
             if is_tag(html_list[index]):
-                return (index, get_tag_name(html_list[index]))
+                return (index - 1, get_tag_name(html_list[index]))
     # is both
     elif is_tag(html_list[index], which_tag='both'):
         while True:
             index += 1
             if index >= len(html_list):
-                return None
+                return (index-1, None)
             if is_tag(html_list[index]):
                 return (index, get_tag_name(html_list[index]))
     # is a start tag
@@ -215,7 +215,7 @@ def get_next_tag(html_list, index):
         while True:
             index += 1
             if index >= len(html_list):
-                return None
+                return (index-1,None)
             if is_tag(html_list[index]):
                 if start_tags == end_tags:
                     return (index, get_tag_name(html_list[index]))
@@ -349,6 +349,25 @@ def compare_tree(wrapper_list, sample_list):
                 # not iterator --> optional -- cross matching
                 new_wrapper_idx, wrapper_next_tag = get_next_tag(wrapper_list, idxs[0])
                 new_sample_idx, sample_next_tag = get_next_tag(sample_list, idxs[1])
+                #wrapper has no next tag
+                if not wrapper_next_tag:
+                    # sample is optional
+                    regex_to_add = sample_list[idxs[1]:new_sample_idx]
+                    regex_to_add[0] = "(" + regex_to_add[0]
+                    regex_to_add[-1] = regex_to_add[-1] + ")?"
+                    regex_list = regex_list + regex_to_add
+                    idxs[1] = new_sample_idx
+                #sample has no next tag
+                if not sample_next_tag:
+                    # wrapper is optional
+                    regex_to_add = wrapper_list[idxs[0]:new_wrapper_idx]
+                    regex_to_add[0] = "(" + regex_to_add[0]
+                    regex_to_add[-1] = regex_to_add[-1] + ")?"
+                    regex_list = regex_list + regex_to_add
+                    idxs[0] = new_wrapper_idx
+                #wrapper and sample have no next tag
+                if not sample_next_tag and not wrapper_next_tag:
+                    print("OBA STA None!!!!!!")
                 if wrapper_next_tag == curr_sample_tag_name:
                     # wrapper is optional
                     regex_to_add = wrapper_list[idxs[0]:new_wrapper_idx]

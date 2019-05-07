@@ -64,7 +64,7 @@ def extract_from_rtvslo(file_name: str):
 
 
 def extract_from_ideo(file_name: str):
-    html_content = open(base_content_path + file_name, 'r', encoding="latin-1").read()
+    html_content = open(base_content_path + file_name, 'r', encoding="windows-1250").read()
     html_tree = html.fromstring(html_content)
 
     title = """//*[@id="izdelki_okvir"]/div/div/div/div/a/text()"""
