@@ -377,20 +377,24 @@ def get_wrapper(file_name1, file_name2, encoding="utf-8"):
 if __name__ == "__main__":
     # file1 = "../tests/test_html1.html"
     # file2 = "../tests/test_html2.html"
-    file1 = "../input/rtvslo.si/Audi.html"
-    file2 = "../input/rtvslo.si/Volvo.html"
-    # file1 = "../input/overstock.com/jewelry01.html"
-    # file2 = "../input/overstock.com/jewelry02.html"
+    #file1 = "../input/rtvslo.si/Audi.html"
+    #file2 = "../input/rtvslo.si/Volvo.html"
+    file1 = "../input/ideo.si/ideo1.html"
+    file2 = "../input/ideo.si/ideo2.html"
     # file1 = "../tests/html_example1.html"
     # file2 = "../tests/html_example2.html"
+    # file1 = "../input/overstock.com/jewelry01.html"
+    # file2 = "../input/overstock.com/jewelry02.html"
 
-    output_regex, sample_content = get_wrapper(file1, file2)
-    # output_regex, sample_content = get_wrapper(file1, file2, encoding="Latin-1")
-    output_regex = replace_tags(output_regex)
+
+    output_regex, sample_content = get_wrapper(file1, file2, encoding="windows-1250")
+    #output_regex, sample_content = get_wrapper(file1, file2, encoding="Latin-1")
+    #output_regex, sample_content = get_wrapper("../input/ideo.si/stroji za pometanje _ ideo.si.html", "../input/ideo.si/Termostatski podometni kompleti _ ideo.si.html", encoding="windows-1250")
+    #output_regex = replace_tags(output_regex)
     print()
     print(output_regex)
 
-    # with open("../tests/rtv1.html", "w", encoding="utf-8") as file:
-    #     file.write(sample_content)
-    print(sample_content)
-    print(re.search(output_regex, sample_content))
+    with open("../outputs/road_runner/ideo", "w", encoding="utf-8") as file:
+         file.write(output_regex)
+    print(output_regex)
+

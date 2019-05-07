@@ -94,9 +94,9 @@ if __name__ == "__main__":
     rtv_volvo_html = open("../input/rtvslo.si/Volvo.html", 'r', encoding="utf-8").read()
     extract_from_rtvslo(rtv_volvo_html)
 
-    # Primer IDEO.SI
-    ideo_pometaci_html = open("../input/ideo.si/stroji za pometanje _ ideo.si.html", 'r',encoding="windows-1250").read()
+    # Primer IDEO
+    ideo_pometaci_html = open("../input/ideo.si/ideo1.html", 'r', encoding="windows-1250").read()
     extract_from_ideo(ideo_pometaci_html)
 
-    ideo_podmetni_kompleti_html = open("../input/ideo.si/Termostatski podometni kompleti _ ideo.si.html", 'r',encoding="windows-1250").read()
+    ideo_podmetni_kompleti_html = open("../input/ideo.si/ideo2.html", 'r', encoding="windows-1250").read()
     extract_from_ideo(ideo_podmetni_kompleti_html)
